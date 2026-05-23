@@ -42,7 +42,7 @@ class RBFEEdge(BaseModel):
         ..., description="Atom index mapping from Ligand A to Ligand B"
     )
 
-    ligand_ff: LigandForcefield = LigandForcefield.OPENFF
+    ligand_ff: LigandForcefield = LigandForcefield.GAFF2
     protein_ff: ProteinForcefield = ProteinForcefield.AMBER14SB
 
     solvent_padding_nm: float = Field(
@@ -164,16 +164,31 @@ def setup_alchemical_system(config: "RBFEEdge"):
     int_mapping = {int(k): int(v) for k, v in config.mapping.items()}
 
     lig_a_aligned = BSS.Align.rmsdAlign(lig_a, lig_b, int_mapping)
-    merged = BSS.Align.merge(
-        lig_a_aligned,
-        lig_b,
-        int_mapping,
-        allow_ring_breaking=True,
-        allow_ring_size_change=True,
-    )
+    transformation_type = str(config.metadata.get("notes", "unknown")).lower()
+    if "ring" in transformation_type:
+        merged = BSS.Align.merge(
+            lig_a_aligned,
+            lig_b,
+            int_mapping,
+            allow_ring_breaking=True,
+            allow_ring_size_change=True,
+            force=True
+        )
+    elif "standard" in transformation_type:
+        merged = BSS.Align.merge(
+            lig_a_aligned,
+            lig_b,
+            int_mapping,
+        )
+    else:
+        raise ValueError(
+            f"Unrecognized transformation type in metadata notes: '{transformation_type}'. "
+            "Please include 'ring' or 'standard' in the notes to indicate the expected transformation."
+        )
 
     # Diagnostic extraction using Sire
-    merged_system = merged.toSystem()
+    # merged_system = merged.toSystem()
+    merged_system = merged
     sire_system = sr.convert.biosimspace_to_sire(merged_system)
 
     mol = sire_system.molecules("molecule property is_perturbable")
@@ -206,26 +221,39 @@ def setup_alchemical_system(config: "RBFEEdge"):
     protein = protein_xtal.extract(
         [atom.index() for atom in protein_xtal.search("not resname WAT").atoms()]
     )
-    xtal_waters = protein_xtal.extract(
-        [atom.index() for atom in protein_xtal.search("resname WAT").atoms()]
-    )
-
+    try:
+        xtal_waters = protein_xtal.extract(
+            [atom.index() for atom in protein_xtal.search("resname WAT").atoms()]
+        )
+    except Exception as e:
+        print(
+            f"Warning: Failed to extract crystal waters from {config.protein_path.name}. "
+            "Proceeding without them. Error details: "
+        )
+        print(e)
+        xtal_waters = None
     # Parameterize using the protein FF defined in your schema
     if config.protein_ff.name == "AMBER14SB":
         protein = BSS.Parameters.ff14SB(protein, ensure_compatible=False).getMolecule()
-        xtal_waters = BSS.Parameters.ff14SB(
-            xtal_waters, water_model="tip3p", ensure_compatible=False
-        ).getMolecule()
+        if xtal_waters is not None:
+            xtal_waters = BSS.Parameters.ff14SB(
+                xtal_waters, water_model="tip3p", ensure_compatible=False
+            ).getMolecule()
     elif config.protein_ff.name == "AMBER99SB_ILDN":
         protein = BSS.Parameters.ff99SBildn(
             protein, ensure_compatible=False
         ).getMolecule()
-        xtal_waters = BSS.Parameters.ff99SBildn(
-            xtal_waters, water_model="tip3p", ensure_compatible=False
-        ).getMolecule()
+        if xtal_waters is not None:
+            xtal_waters = BSS.Parameters.ff99SBildn(
+                xtal_waters, water_model="tip3p", ensure_compatible=False
+            ).getMolecule()
 
     # Combine into holo system
-    protein_holo = protein.toSystem() + merged + xtal_waters
+    # protein_holo = protein.toSystem() + merged + xtal_waters
+    if xtal_waters is not None:
+        protein_holo = protein + merged + xtal_waters
+    else:
+        protein_holo = protein + merged
 
     solvated_bound = _solvate_and_neutralize(
         system_to_solvate=protein_holo,
