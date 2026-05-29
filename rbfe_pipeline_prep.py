@@ -165,7 +165,7 @@ def setup_alchemical_system(config: "RBFEEdge"):
 
     lig_a_aligned = BSS.Align.rmsdAlign(lig_a, lig_b, int_mapping)
     transformation_type = str(config.metadata.get("notes", "unknown")).lower()
-    if "ring" in transformation_type:
+    if "bond" in transformation_type:
         merged = BSS.Align.merge(
             lig_a_aligned,
             lig_b,
@@ -183,7 +183,7 @@ def setup_alchemical_system(config: "RBFEEdge"):
     else:
         raise ValueError(
             f"Unrecognized transformation type in metadata notes: '{transformation_type}'. "
-            "Please include 'ring' or 'standard' in the notes to indicate the expected transformation."
+            "Please include 'bond' or 'standard' in the notes to indicate the expected transformation."
         )
 
     # Diagnostic extraction using Sire

@@ -3,7 +3,7 @@
     "edge_id": "chk1_c20_to_c17",
     "metadata": {
       "experimental_ddg_kcal_mol": -0.51,
-      "notes": "Ring break"
+      "notes": "Bond annihilation"
     },
     "ligand_a_path": "inputs/ligands/chk_20.sdf",
     "ligand_b_path": "inputs/ligands/chk_17.sdf",
@@ -134,7 +134,7 @@
     "edge_id": "facx_4d_to_edo",
     "metadata": {
       "experimental_ddg_kcal_mol": -0.87,
-      "notes": "Ring break"
+      "notes": "Bond annihilation"
     },
     "ligand_a_path": "inputs/ligands/facx_4d.sdf",
     "ligand_b_path": "inputs/ligands/facx_edo.sdf",
@@ -217,7 +217,7 @@
     "edge_id": "facx_4c_to_edo",
     "metadata": {
       "experimental_ddg_kcal_mol": -99,
-      "notes": "Ring break"
+      "notes": "Bond annihilation"
     },
     "ligand_a_path": "inputs/ligands/facx_4c.sdf",
     "ligand_b_path": "inputs/ligands/facx_edo.sdf",
@@ -300,7 +300,7 @@
     "edge_id": "era_2e_to_era_3b",
     "metadata": {
       "experimental_ddg_kcal_mol": 2.44,
-      "notes": "Ring grow. Mapping strategy 3"
+      "notes": "Bond annihilation. Mapping strategy 3"
     },
     "ligand_a_path": "inputs/ligands/era_2e.sdf",
     "ligand_b_path": "inputs/ligands/era_3b.sdf",
@@ -353,7 +353,7 @@
     "edge_id": "era_2d_to_era_3b",
     "metadata": {
       "experimental_ddg_kcal_mol": 1.78,
-      "notes": "Ring grow. Mapping strategy 3"
+      "notes": "Bond annihilation. Mapping strategy 3"
     },
     "ligand_a_path": "inputs/ligands/era_2d.sdf",
     "ligand_b_path": "inputs/ligands/era_3b.sdf",
@@ -473,7 +473,7 @@
     "edge_id": "chk1_c21_to_c21rbi",
     "metadata": {
       "experimental_ddg_kcal_mol": -99,
-      "notes": "Ring break to c17 via intermediate (step 1)"
+      "notes": "Bond annihilation to c17 via intermediate (step 1)"
     },
     "ligand_a_path": "inputs/ligands/chk_21.sdf",
     "ligand_b_path": "inputs/ligands/chk_21_rb_intermediate.sdf",
@@ -608,7 +608,7 @@
     "edge_id": "chk1_c1_to_c17",
     "metadata": {
       "experimental_ddg_kcal_mol": -99,
-      "notes": "Ring break."
+      "notes": "Bond annihilation."
     },
     "ligand_a_path": "inputs/ligands/chk_1.sdf",
     "ligand_b_path": "inputs/ligands/chk_17.sdf",
@@ -673,7 +673,7 @@
     "edge_id": "tpsb_c2_to_c1",
     "metadata": {
       "experimental_ddg_kcal_mol": -99,
-      "notes": "Ring grow."
+      "notes": "Bond annihilation."
     },
     "ligand_a_path": "inputs/ligands/tpsb_2.sdf",
     "ligand_b_path": "inputs/ligands/tpsb_1.sdf",
@@ -743,7 +743,7 @@
     "edge_id": "bace_c7_to_c7rbi",
     "metadata": {
       "experimental_ddg_kcal_mol": -99,
-      "notes": "Ring break to 6 via intermediate (step 1)"
+      "notes": "Bond annihilation to 6 via intermediate (step 1)"
     },
     "ligand_a_path": "inputs/ligands/bace_7.sdf",
     "ligand_b_path": "inputs/ligands/bace_7rbi.sdf",
