@@ -4,3 +4,14 @@
 __pycache__/
 logs/
 output/
+*.dcd
+*.parquet
+*.log
+somd2.lock
+system0.prm7
+system1.prm7
+*.s3
+*.bak
+*.yaml
+*.txt
+*.pkl

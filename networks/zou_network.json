@@ -912,7 +912,7 @@
     "edge_id": "ck2_c2_to_c2rbi",
     "metadata": {
       "experimental_ddg_kcal_mol": -99,
-      "notes": "Macrocycle ring break to c2rbi via intermediate (step 1)"
+      "notes": "Bond annihilation (macrocycle) to c2rbi via intermediate (step 1)"
     },
     "ligand_a_path": "inputs/ligands/ck2_c2.mol",
     "ligand_b_path": "inputs/ligands/ck2_c2rbi.sdf",
@@ -1031,7 +1031,7 @@
     "edge_id": "mth1_c7_to_c6",
     "metadata": {
       "experimental_ddg_kcal_mol": -99,
-      "notes": "Macrocycle ring break to c6 via"
+      "notes": "Bond annihilation (macrocycle) ring break to c6"
     },
     "ligand_a_path": "inputs/ligands/mth1-7.sdf",
     "ligand_b_path": "inputs/ligands/mth1-6.sdf",

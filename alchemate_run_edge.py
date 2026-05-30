@@ -92,37 +92,65 @@ edge_config = RBFEEdge(**edge_dict)
 
 
 
-sire_system = sr.stream.load(f"{edge_config.output_dir}/{leg_name}.bss")
-
-hard_restraints, sire_system = sr.restraints.morse_potential(
-    sire_system,
-    de=f"{de_strength} kcal mol-1",
-    auto_parametrise=True,
-    direct_morse_replacement=True,
-    name="morse_hard"
-)
-print(hard_restraints)
-
-soft_restraints, _ = sr.restraints.morse_potential(
-    sire_system,
-    atoms0=hard_restraints[0].atom0(),
-    atoms1=hard_restraints[0].atom1(),
-    r0=hard_restraints[0].r0(),
-    k=f"{bond_strength} kcal mol-1 A-2",
-    auto_parametrise=False,
-    de=f"{de_strength} kcal mol-1",
-    name="morse_soft",
-)
-print(soft_restraints)
-print(f"Sire system type:{type(sire_system)}")
-
 somd2_config = Config()
 somd2_config.lambda_values = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+
+sire_system = sr.stream.load(f"{edge_config.output_dir}/{leg_name}.bss")
+
+
+# attempt to determine the lambda schedule based on edge metadata, e.g
+#     "edge_id": "chk1_c20_to_c17",
+#     "metadata": {
+#       "experimental_ddg_kcal_mol": -0.51,
+#       "notes": "Bond annihilation"
+#     },
+
+metadata = edge_config.metadata
+
+if metadata and "notes" in metadata and "bond annihilation" in metadata["notes"].lower():
+    somd2_config.lambda_schedule = "ring_break_morph"
+    bond_alchemy = True
+elif metadata and "notes" in metadata and "bond creation" in metadata["notes"].lower():
+    somd2_config.lambda_schedule = "ring_make_morph_reverse"
+    bond_alchemy = True
+elif metadata and "notes" in metadata and "standard morph" in metadata["notes"].lower():
+    somd2_config.lambda_schedule = "standard_morph"
+    bond_alchemy = False
+else:
+    raise ValueError(f"""Unable to determine lambda schedule from edge metadata.
+                    Please ensure that the 'notes' field in the edge metadata contains one of the following:
+                    'bond annihilation', 'bond creation', or 'standard morph'.
+                    Edge metadata: {metadata}""")
+
+if bond_alchemy:
+    hard_restraints, sire_system = sr.restraints.morse_potential(
+        sire_system,
+        de=f"{de_strength} kcal mol-1",
+        auto_parametrise=True,
+        direct_morse_replacement=True,
+        name="morse_hard"
+    )
+    print(hard_restraints)
+
+    soft_restraints, _ = sr.restraints.morse_potential(
+        sire_system,
+        atoms0=hard_restraints[0].atom0(),
+        atoms1=hard_restraints[0].atom1(),
+        r0=hard_restraints[0].r0(),
+        k=f"{bond_strength} kcal mol-1 A-2",
+        auto_parametrise=False,
+        de=f"{de_strength} kcal mol-1",
+        name="morse_soft",
+    )
+    print(soft_restraints)
+    somd2_config.restraints = [hard_restraints, soft_restraints]
+print(f"Sire system type:{type(sire_system)}")
+
 
 if protocol == "testing":
     equib_time = 100
     prod_time = 100
-    frame_freq = 10
+    frame_freq = 100
     checkpoint_freq = 100
 elif protocol == "prod":
     equib_time = 1000
@@ -149,26 +177,6 @@ somd2_config.energy_frequency = "2ps"
 somd2_config.cutoff = "10A"
 somd2_config.cutoff_type = "PME"
 
-# attempt to determine the lambda schedule based on edge metadata, e.g
-#     "edge_id": "chk1_c20_to_c17",
-#     "metadata": {
-#       "experimental_ddg_kcal_mol": -0.51,
-#       "notes": "Bond annihilation"
-#     },
-
-metadata = edge_config.metadata
-if metadata and "notes" in metadata and "bond_annihilation" in metadata["notes"].lower():
-    somd2_config.lambda_schedule = "ring_break_morph"
-elif metadata and "notes" in metadata and "bond_creation" in metadata["notes"].lower():
-    somd2_config.lambda_schedule = "ring_make_morph_reverse"
-elif metadata and "notes" in metadata and "standard morph" in metadata["notes"].lower():
-    somd2_config.lambda_schedule = "standard_morph"
-else:
-    raise ValueError(f"""Unable to determine lambda schedule from edge metadata.
-                    Please ensure that the 'notes' field in the edge metadata contains one of the following:
-                    'bond annihilation', 'bond creation', or 'standard morph'.
-                    Edge metadata: {metadata}""")
-
 
 somd2_config.equilibration_constraints = True
 somd2_config.ghost_modifications = False
@@ -179,7 +187,7 @@ somd2_config.replica_exchange = True
 somd2_config.log_level = "debug"
 
 somd2_config.save_energy_components = False
-somd2_config.restraints = [hard_restraints, soft_restraints]
+
 somd2_config.timeout = "30 s"
 somd2_config.shift_delta = f"1.5A"
 somd2_config.shift_coulomb = f"1A"
