@@ -198,7 +198,7 @@ context = SimulationContext(system=f"{edge_config.output_dir}/{leg_name}.bss", s
 setup_logging(log_path=f"{context.somd2_config.output_directory}/alchemate.log")
 
 simulation_workflow = [
-    OptimizeLambdaProbabilities(optimization_attempts=10, optimization_target="repex_matrix", optimization_threshold=0.10, optimization_runtime="500ps", vacuum_optimization=False),
+    # OptimizeLambdaProbabilities(optimization_attempts=10, optimization_target="repex_matrix", optimization_threshold=0.10, optimization_runtime="500ps", vacuum_optimization=False),
     RunBasicCalculation(calculation_runtime=f"{prod_time}ps"),
 ]
 

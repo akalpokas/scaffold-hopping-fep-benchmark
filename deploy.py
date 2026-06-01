@@ -39,7 +39,7 @@ def submit_jobs(network_path: Path, specific_edge: str = None, protocol: str = "
                 sbatch_cmd = [
                     "sbatch",
                     f"--job-name=rbfe_{edge_id}_{leg}_rep{rep}", 
-                    f"--output=logs/{edge_id}_{leg}_rep{rep}.slurm.out",
+                    f"--output=slurm_logs/{edge_id}_{leg}_rep{rep}.slurm.out",
                     "slurm_run_singularity_prod.sh",    
                     str(network_path),  
                     str(edge_id),             

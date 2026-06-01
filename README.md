@@ -2,40 +2,69 @@
 
 # Instructions
 
-| Script    | Purpose |
-| -------- | ------- |
-| `rbfe_pipeline_prep.py` | Constructs the alchemical inputs & ready SOMD2 run files from raw inputs |
-| `deploy.py` | Deploys the network and built alchemical inputs to HPC processing |
-| `slurm_run_singularity_prod.sh` | Sets up the slurm template for individual HPC needs |
-| `alchemate_run_edge` | Runs the alchemical transformation using alchemate workflows and SOMD2 |
+Tools - Use them to process a network from start to finish.  
+Templates - Modify them once to align to specific HPC or simulation processing needs.
 
-To process the mappings for a given network
+| Script    | Type | Purpose |
+| -------- | -------- | ------- |
+| `rbfe_pipeline_prep.py` | Tool | Constructs the alchemical inputs & production ready SOMD2 run files from raw inputs |
+| `deploy.py` | Tool | Deploys the network and built alchemical inputs for processing |
+| `analyse.py` |  Tool | Runs various analysis workflows on the processed network |
+| `slurm_run_singularity_prod.sh` | Template | Sets up the slurm template for individual HPC needs |
+| `edge_runner.py` | Template | Runs the alchemical transformation using alchemate workflows and SOMD2 |
+| `clean_runs.py` | Tool | Convenience script for removing previously ran simulations with a specific protocol |
+
+## Alchemical input generation
+To process the mappings for a given network:
 ```python
 python rbfe_pipeline_prep.py map --network network.json
 ```
-To process the mappings for a given network and a specific edge
+To process the mappings for a given network and a specific edge:
 ```python
 python rbfe_pipeline_prep.py map --network network.json --edge ligA_to_ligB
 
 # For example:
 python rbfe_pipeline_prep.py map --network networks/zou_network.json --edge-id chk1_c20_to_c17
 ```
-To run the full parametrisation stage and alchemical setup
+To run the full parametrisation stage and alchemical setup:
 ```python
 python rbfe_pipeline_prep.py setup --network network.json
 ```
 
+## Network Deployment
+To deploy a single replicate testing protocol run for free and bound legs:
+```python
+python deploy.py --network networks/zou_network.json --protocol testing --leg both --replicate 1
+```
+
+## Analysis
+
+To run a basic analysis workflow on all 1st free leg replicates in a given network:
+```python
+python analyse.py --network networks/zou_network.json --modules energy_traj --protocol testing --leg_name free --k 125 --de 150 --replicate 1
+```
 
 # Data Flow
 ```mermaid
+---
+config:
+  theme: 'base'
+  themeVariables:
+    primaryColor: '#BB2528'
+    primaryTextColor: '#F8B229'
+    lineColor: '#F8B229'
+    secondaryColor: '#006100'
+    tertiaryColor: '#0f0f0f'
+    background: '#ffffff'
+---
 flowchart TD
-    classDef file fill:#f9f9f9,stroke:#333,stroke-width:1px;
+    classDef file fill:#f9f9f9,stroke:#333,stroke-width:2px;
     classDef script fill:#e1f5fe,stroke:#0288d1,stroke-width:2px;
     classDef check fill:#fff3e0,stroke:#f57c00,stroke-width:2px;
 
     subgraph Inputs ["1. Raw Inputs"]
         JSON(network.json):::file
-        SDF(Ligand SDFs):::file
+        SDF(Ligand SDFs/MOLs):::file
         PDB(Protein PDBs):::file
     end
 
@@ -59,8 +88,13 @@ flowchart TD
         Deploy[deploy.py]:::script
         Slurm((SLURM))
         Bash[slurm_run_singularity_prod.sh]:::script
-        Run[run_edge.py]:::script
-        MD[(Outputs)]
+        Run[edge_runner.py]:::script
+        MD[(Raw MD Data)]
+    end
+
+    subgraph Analysis ["5. Analysis"]
+        Analyse[analyse.py]:::script
+        FinalData[(Processed MD Data)]
     end
 
     %% Step 1 to 2
@@ -83,7 +117,12 @@ flowchart TD
     Free -.->|Loaded by| Run
     Bound -.->|Loaded by| Run
     
-    Run -->|Executes SOM2| MD
+    Run -->|Executes SOMD2| MD
+
+    %% Step 4 to 5
+    JSON -->|Analysed by| Analyse
+    MD -->|Analysed by| Analyse
+    Analyse -->| Produces | FinalData
 ```
 
 # Software versioning
