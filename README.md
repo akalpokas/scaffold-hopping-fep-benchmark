@@ -50,11 +50,8 @@ python analyse.py --network networks/zou_network.json --modules energy_traj --pr
 config:
   theme: 'base'
   themeVariables:
-    primaryColor: '#BB2528'
     primaryTextColor: '#F8B229'
     lineColor: '#F8B229'
-    secondaryColor: '#006100'
-    tertiaryColor: '#0f0f0f'
     background: '#ffffff'
 ---
 flowchart TD
