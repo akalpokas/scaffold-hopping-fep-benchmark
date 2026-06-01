@@ -46,14 +46,6 @@ python analyse.py --network networks/zou_network.json --modules energy_traj --pr
 
 # Data Flow
 ```mermaid
----
-config:
-  theme: 'base'
-  themeVariables:
-    primaryTextColor: '#F8B229'
-    lineColor: '#F8B229'
-    background: '#ffffff'
----
 flowchart TD
     classDef file fill:#f9f9f9,stroke:#333,stroke-width:2px;
     classDef script fill:#e1f5fe,stroke:#0288d1,stroke-width:2px;
