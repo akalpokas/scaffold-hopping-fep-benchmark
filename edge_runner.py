@@ -7,7 +7,6 @@ from alchemate.manager import WorkflowManager
 from alchemate.context import SimulationContext
 from alchemate.steps.preprocessing import OptimizeLambdaProbabilities
 from alchemate.steps.base import RunBasicCalculation
-from alchemate.steps.postprocessing import OptimizeConvergence
 from alchemate.logger import setup_logging
 
 # Import schema from the setup rbfe pipeline
@@ -125,7 +124,7 @@ else:
 if bond_alchemy:
     hard_restraints, sire_system = sr.restraints.morse_potential(
         sire_system,
-        de=f"{de_strength} kcal mol-1",
+        de="150 kcal mol-1",
         auto_parametrise=True,
         direct_morse_replacement=True,
         name="morse_hard"

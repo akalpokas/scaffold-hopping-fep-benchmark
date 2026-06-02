@@ -15,8 +15,9 @@ NETWORK=$1
 EDGE_ID=$2
 PROTOCOL=$3
 LEG=$4
-DE_STRENGTH=$5
-REPLICATE=$6
+BOND_STRENGTH=$5
+DE_STRENGTH=$6
+REPLICATE=$7
 
 
 echo "Running on node: ${SLURM_NODELIST}"
@@ -24,7 +25,8 @@ echo "Using network file: ${NETWORK}"
 echo "Starting job for edge: ${EDGE_ID}"
 echo "Using run script: ${PROTOCOL}"
 echo "Leg: ${LEG}"
-echo "DE strength: ${DE_STRENGTH}"
+echo "Soft Morse Bond strength: ${BOND_STRENGTH}"
+echo "Soft Morse DE strength: ${DE_STRENGTH}"
 echo "Replicate: ${REPLICATE}"
 
 export NUMEXPR_MAX_THREADS=32
@@ -32,4 +34,4 @@ export NUMEXPR_MAX_THREADS=32
 
 apptainer run --nv --bind /path/to/benchmark/ \
  /path/to/apptainer/image.sif \
- python edge_runner.py --network "$NETWORK" --edge-id "$EDGE_ID" --protocol "$PROTOCOL" --leg_name "$LEG"  --de_strength "$DE_STRENGTH" --replicate "$REPLICATE"
+ python edge_runner.py --network "$NETWORK" --edge-id "$EDGE_ID" --protocol "$PROTOCOL" --leg_name "$LEG" --bond_strength "$BOND_STRENGTH" --de_strength "$DE_STRENGTH" --replicate "$REPLICATE"
