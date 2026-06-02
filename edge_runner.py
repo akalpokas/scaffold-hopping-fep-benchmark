@@ -184,6 +184,7 @@ somd2_config.h_mass_factor = 3
 somd2_config.rest2_scale = 1
 somd2_config.replica_exchange = True
 somd2_config.log_level = "debug"
+somd2_config.save_xml = True
 
 somd2_config.save_energy_components = False
 

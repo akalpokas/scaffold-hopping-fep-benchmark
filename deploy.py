@@ -15,7 +15,7 @@ def submit_jobs(
     de_strength: int = 150,
 ):
 
-    Path("logs").mkdir(exist_ok=True)
+    Path("slurm_logs").mkdir(exist_ok=True)
     with open(network_path, "r") as f:
         edges_data = json.load(f)
 
@@ -55,7 +55,7 @@ def submit_jobs(
                     "sbatch",
                     f"--job-name=rbfe_{edge_id}_{leg}_rep{rep}",
                     f"--output=slurm_logs/{edge_id}_{leg}_rep{rep}.slurm.out",
-                    "slurm_run_singularity_prod.sh",
+                    "slurm_run_apptainer_prod.sh",
                     str(network_path),
                     str(edge_id),
                     str(protocol),
