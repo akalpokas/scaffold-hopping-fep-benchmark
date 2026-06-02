@@ -10,7 +10,7 @@ Templates - Modify them once to align to specific HPC or simulation processing n
 | `rbfe_pipeline_prep.py` | Tool | Constructs the alchemical inputs & production ready SOMD2 run files from raw inputs |
 | `deploy.py` | Tool | Deploys the network and built alchemical inputs for processing |
 | `analyse.py` |  Tool | Runs various analysis workflows on the processed network |
-| `slurm_run_singularity_prod.sh` | Template | Sets up the slurm template for individual HPC needs |
+| `slurm_run_apptainer_prod.sh` | Template | Sets up the slurm template for individual HPC needs |
 | `edge_runner.py` | Template | Runs the alchemical transformation using alchemate workflows and SOMD2 |
 | `clean_runs.py` | Tool | Convenience script for removing previously ran simulations with a specific protocol |
 
@@ -76,7 +76,7 @@ flowchart TD
     subgraph Cluster ["4. HPC Deployment"]
         Deploy[deploy.py]:::script
         Slurm((SLURM))
-        Bash[slurm_run_singularity_prod.sh]:::script
+        Bash[slurm_run_apptainer_prod.sh]:::script
         Run[edge_runner.py]:::script
         MD[(Raw MD Data)]
     end
