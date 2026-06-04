@@ -3,11 +3,13 @@ import argparse
 from pathlib import Path
 
 # Import analysis modules
+from analysis_modules.ddG import ddGAnalyzer
 from analysis_modules.energy_traj import EnergyTrajAnalyzer
 
 # Registry of available analyses
 AVAILABLE_MODULES = {
     "energy_traj": EnergyTrajAnalyzer(),
+    "ddG": ddGAnalyzer(),
 }
 
 def run_analysis(network_path: Path, active_modules: list, protocol: str, k: str, de: str):
