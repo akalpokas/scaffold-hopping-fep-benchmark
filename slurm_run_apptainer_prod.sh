@@ -18,20 +18,34 @@ LEG=$4
 BOND_STRENGTH=$5
 DE_STRENGTH=$6
 REPLICATE=$7
+GHOST_STRING=$8  # Catches "True"
+
+GHOST_FLAG=""
+if [ "$GHOST_STRING" = "True" ]; then
+    GHOST_FLAG="--ghost_modifications"
+fi
 
 
 echo "Running on node: ${SLURM_NODELIST}"
 echo "Using network file: ${NETWORK}"
 echo "Starting job for edge: ${EDGE_ID}"
-echo "Using run script: ${PROTOCOL}"
+echo "Using run protocol: ${PROTOCOL}"
 echo "Leg: ${LEG}"
 echo "Soft Morse Bond strength: ${BOND_STRENGTH}"
 echo "Soft Morse DE strength: ${DE_STRENGTH}"
 echo "Replicate: ${REPLICATE}"
+echo "Ghost Modifications: ${GHOST_STRING}"
 
 export NUMEXPR_MAX_THREADS=32
 
-
 apptainer run --nv --bind /path/to/benchmark/ \
  /path/to/apptainer/image.sif \
- python edge_runner.py --network "$NETWORK" --edge-id "$EDGE_ID" --protocol "$PROTOCOL" --leg_name "$LEG" --bond_strength "$BOND_STRENGTH" --de_strength "$DE_STRENGTH" --replicate "$REPLICATE"
+ python edge_runner.py \
+    --network "$NETWORK" \
+    --edge-id "$EDGE_ID" \
+    --protocol "$PROTOCOL" \
+    --leg_name "$LEG" \
+    --bond_strength "$BOND_STRENGTH" \
+    --de_strength "$DE_STRENGTH" \
+    --replicate "$REPLICATE" \
+    $GHOST_FLAG
