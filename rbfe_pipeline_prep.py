@@ -17,10 +17,12 @@ import sire as sr
 class LigandForcefield(str, Enum):
     OPENFF = "openff"
     GAFF2 = "gaff2"
+    PRE_PARAMETRIZED = "pre_parametrized"
 
 
 class ProteinForcefield(str, Enum):
     AMBER14SB = "amber14"
+    PRE_PARAMETRIZED = "pre_parametrized"
 
 
 class RBFEEdge(BaseModel):
@@ -33,10 +35,10 @@ class RBFEEdge(BaseModel):
         description="Optional tracking info like experimental ddG, Lomap scores, etc.",
     )
 
-    # FilePath ensures the files actually exist before the pipeline does anything
-    ligand_a_path: FilePath
-    ligand_b_path: FilePath
-    protein_path: FilePath
+    # Allow multiple paths for topology + coordinate pairs
+    ligand_a_paths: list[FilePath]
+    ligand_b_paths: list[FilePath]
+    protein_paths: list[FilePath]
 
     mapping: Dict[int, int] = Field(
         ..., description="Atom index mapping from Ligand A to Ligand B"
@@ -97,8 +99,13 @@ def visualize_mcs(config: "RBFEEdge"):
     """
     Generates and saves the BioSimSpace 2D mapping visualization.
     """
-    mol_a = BSS.IO.readMolecules(str(config.ligand_a_path))[0]
-    mol_b = BSS.IO.readMolecules(str(config.ligand_b_path))[0]
+
+    # Convert lists of FilePaths to lists of strings for BSS
+    lig_a_files = [str(p) for p in config.ligand_a_paths]
+    lig_b_files = [str(p) for p in config.ligand_b_paths]
+
+    mol_a = BSS.IO.readMolecules(lig_a_files)[0]
+    mol_b = BSS.IO.readMolecules(lig_b_files)[0]
 
     mapping = config.mapping
 
@@ -142,20 +149,48 @@ def setup_alchemical_system(config: "RBFEEdge"):
     # ==========================================
     # Load and Parameterize Ligands
     # ==========================================
-    lig_a = BSS.IO.readMolecules([str(config.ligand_a_path)])[0]
-    lig_b = BSS.IO.readMolecules([str(config.ligand_b_path)])[0]
+
+    lig_a_files = [str(p) for p in config.ligand_a_paths]
+    lig_b_files = [str(p) for p in config.ligand_b_paths]
+
+    lig_a = BSS.IO.readMolecules(lig_a_files)[0]
+    lig_b = BSS.IO.readMolecules(lig_b_files)[0]
 
     # Map the schema Enum to the specific BSS function calls
     if config.ligand_ff.name == "GAFF2":
         lig_a = BSS.Parameters.gaff2(lig_a).getMolecule()
         lig_b = BSS.Parameters.gaff2(lig_b).getMolecule()
-    else:
+    elif config.ligand_ff.name == "OPENFF":
         lig_a = BSS.Parameters.openff_unconstrained_2_2_1(
             lig_a, use_nagl=False
         ).getMolecule()
         lig_b = BSS.Parameters.openff_unconstrained_2_2_1(
             lig_b, use_nagl=False
         ).getMolecule()
+    elif config.ligand_ff.name == "PRE_PARAMETRIZED":
+        # If the ligands are already parameterized, we assume they are in a format that BSS can read directly.
+        # This is a placeholder for any additional processing that might be needed for pre-parameterized ligands.
+        pass
+    else:
+        # Get the Enum class dynamically
+        enum_class = type(config.ligand_ff)
+
+        # Extract all the string values (e.g., ['openff', 'gaff2', 'pre_parametrized'])
+        supported_options = [ff.value for ff in enum_class]
+
+        # Format them nicely into a string: "'openff', 'gaff2', and 'pre_parametrized'"
+        if len(supported_options) > 1:
+            formatted_string = (
+                ", ".join(f"'{ff}'" for ff in supported_options[:-1])
+                + f", and '{supported_options[-1]}'"
+            )
+        else:
+            formatted_string = f"'{supported_options[0]}'"
+
+        raise ValueError(
+            f"Unsupported ligand forcefield: '{config.ligand_ff.value}'. "
+            f"Supported options are: {formatted_string}."
+        )
 
     # ==========================================
     # Align, Merge, and Extract Diagnostics
@@ -172,7 +207,7 @@ def setup_alchemical_system(config: "RBFEEdge"):
             int_mapping,
             allow_ring_breaking=True,
             allow_ring_size_change=True,
-            force=True
+            force=True,
         )
     elif "standard" in transformation_type:
         merged = BSS.Align.merge(
@@ -216,7 +251,8 @@ def setup_alchemical_system(config: "RBFEEdge"):
     # ==========================================
     # Load Protein, Parameterize, and Save Bound Leg
     # ==========================================
-    protein_xtal = BSS.IO.readMolecules([str(config.protein_path)])[0]
+    protein_files = [str(p) for p in config.protein_paths]
+    protein_xtal = BSS.IO.readMolecules(protein_files)[0]
 
     protein = protein_xtal.extract(
         [atom.index() for atom in protein_xtal.search("not resname WAT").atoms()]
@@ -227,7 +263,7 @@ def setup_alchemical_system(config: "RBFEEdge"):
         )
     except Exception as e:
         print(
-            f"Warning: Failed to extract crystal waters from {config.protein_path.name}. "
+            f"Warning: Failed to extract crystal waters from {config.protein_paths[0].name}. "
             "Proceeding without them. Error details: "
         )
         print(e)
@@ -239,14 +275,33 @@ def setup_alchemical_system(config: "RBFEEdge"):
             xtal_waters = BSS.Parameters.ff14SB(
                 xtal_waters, water_model="tip3p", ensure_compatible=False
             ).getMolecule()
-    elif config.protein_ff.name == "AMBER99SB_ILDN":
-        protein = BSS.Parameters.ff99SBildn(
-            protein, ensure_compatible=False
-        ).getMolecule()
-        if xtal_waters is not None:
-            xtal_waters = BSS.Parameters.ff99SBildn(
-                xtal_waters, water_model="tip3p", ensure_compatible=False
-            ).getMolecule()
+
+    elif config.protein_ff.name == "PRE_PARAMETRIZED":
+        # If the protein is already parameterized, we assume it is in a format that BSS can read directly.
+        # This is a placeholder for any additional processing that might be needed for pre-parameterized proteins.
+        pass
+    else:
+        # Get the Enum class dynamically
+        enum_class = type(config.protein_ff)
+
+        # Extract all the string values (e.g., ['amber14', 'pre_parametrized'])
+        supported_options = [ff.value for ff in enum_class]
+
+        # Format them nicely into a string: "'amber14' and 'pre_parametrized'"
+        if len(supported_options) > 1:
+            formatted_string = " and ".join(
+                [
+                    ", ".join(f"'{ff}'" for ff in supported_options[:-1]),
+                    f"'{supported_options[-1]}'",
+                ]
+            )
+        else:
+            formatted_string = f"'{supported_options[0]}'"
+
+            raise ValueError(
+                f"Unsupported protein forcefield: '{config.protein_ff.value}'. "
+                f"Supported options are: {formatted_string}."
+            )
 
     # Combine into holo system
     # protein_holo = protein.toSystem() + merged + xtal_waters
