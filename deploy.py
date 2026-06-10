@@ -13,6 +13,7 @@ def submit_jobs(
     replicate: int = None,
     bond_strength: int = 125,
     de_strength: int = 150,
+    ghost_modifications: bool = False,
 ):
 
     Path("slurm_logs").mkdir(exist_ok=True)
@@ -63,6 +64,7 @@ def submit_jobs(
                     str(bond_strength),
                     str(de_strength),
                     str(rep),
+                    str(ghost_modifications),
                 ]
 
                 try:
@@ -125,8 +127,14 @@ if __name__ == "__main__":
     parser.add_argument(
         "--de_strength",
         type=int,
-        default=150,
+        default=50,
         help="Soft Morse dissociation energy parameter for the run",
+    )
+
+    parser.add_argument(
+        "--ghost_modifications",
+        action="store_true",
+        help="Whether to apply ghost modifications to the system. If not provided, ghost modifications will not be applied",
     )
 
     args = parser.parse_args()
@@ -139,4 +147,5 @@ if __name__ == "__main__":
         replicate=args.replicate,
         bond_strength=args.bond_strength,
         de_strength=args.de_strength,
+        ghost_modifications=args.ghost_modifications,
     )

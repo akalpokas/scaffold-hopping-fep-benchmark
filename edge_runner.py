@@ -35,14 +35,13 @@ def get_user_input():
         required=True,
         help="Type of runtime protocol to use. Options: 'testing', 'prod', 'long'",
     )
-    parser.add_argument(
-        "--de_strength", type=str, required=True, help="DE strength"
-    )
+    parser.add_argument("--de_strength", type=str, required=True, help="DE strength")
     parser.add_argument(
         "--leg_name",
         type=str,
         required=True,
-        help="Leg to run. Options: 'free' or 'bound'")
+        help="Leg to run. Options: 'free' or 'bound'",
+    )
     parser.add_argument(
         "--replicate",
         type=int,
@@ -50,7 +49,16 @@ def get_user_input():
         help="Replicate to run. If not provided, all replicates will be run",
     )
     parser.add_argument(
-        "--bond_strength", type=str, required=False, help="Bond strength for soft morse potential. If not provided, a default value of 125 kcal/mol/A^2 will be used", default=125
+        "--bond_strength",
+        type=str,
+        required=False,
+        help="Bond strength for soft morse potential. If not provided, a default value of 125 kcal/mol/A^2 will be used",
+        default=125,
+    )
+    parser.add_argument(
+        "--ghost_modifications",
+        action="store_true",
+        help="Whether to apply ghost modifications to the system. If not provided, ghost modifications will not be applied",
     )
 
     args = parser.parse_args()
@@ -62,6 +70,7 @@ def get_user_input():
         args.leg_name,
         args.replicate,
         args.bond_strength,
+        args.ghost_modifications,
     )
 
 
@@ -75,11 +84,12 @@ if __name__ == "__main__":
         leg_name,
         replicate,
         bond_strength,
+        ghost_modifications,
     ) = get_user_input()
 
 
 # Load the edge information from the network file
-with open(network, 'r') as f:
+with open(network, "r") as f:
     network_data = json.load(f)
 edge_dict = next((item for item in network_data if item["edge_id"] == edge_id), None)
 
@@ -106,7 +116,11 @@ sire_system = sr.stream.load(f"{edge_config.output_dir}/{leg_name}.bss")
 
 metadata = edge_config.metadata
 
-if metadata and "notes" in metadata and "bond annihilation" in metadata["notes"].lower():
+if (
+    metadata
+    and "notes" in metadata
+    and "bond annihilation" in metadata["notes"].lower()
+):
     somd2_config.lambda_schedule = "ring_break_morph"
     bond_alchemy = True
 elif metadata and "notes" in metadata and "bond creation" in metadata["notes"].lower():
@@ -127,7 +141,7 @@ if bond_alchemy:
         de="150 kcal mol-1",
         auto_parametrise=True,
         direct_morse_replacement=True,
-        name="morse_hard"
+        name="morse_hard",
     )
     print(hard_restraints)
 
@@ -148,9 +162,12 @@ print(f"Sire system type:{type(sire_system)}")
 
 if protocol == "testing":
     equib_time = 100
-    prod_time = 100
-    frame_freq = 100
-    checkpoint_freq = 100
+    prod_time = 1000
+    frame_freq = 250
+    checkpoint_freq = 500
+
+    somd2_config.save_crash_report = True
+    somd2_config.save_energy_components = True
 elif protocol == "prod":
     equib_time = 1000
     prod_time = 10000
@@ -162,23 +179,31 @@ elif protocol == "long":
     frame_freq = 250
     checkpoint_freq = 1000
 else:
-    raise ValueError(f"Invalid protocol: {protocol}. Options are: 'testing', 'prod', 'long'")
+    raise ValueError(
+        f"Invalid protocol: {protocol}. Options are: 'testing', 'prod', 'long'"
+    )
 
-somd2_config.output_directory = f"{edge_config.output_dir}/{leg_name}_k_{int(bond_strength)}_de_{int(de_strength)}_{protocol}_protocol_repl_{replicate}"
+if ghost_modifications:
+    somd2_config.ghost_modifications = True
+    mods_prefix = "ghost_mods"
+else:
+    somd2_config.ghost_modifications = False
+    mods_prefix = ""
+
+somd2_config.output_directory = f"{edge_config.output_dir}/{leg_name}_k_{int(bond_strength)}_{mods_prefix}_de_{int(de_strength)}_{protocol}_protocol_repl_{replicate}"
 somd2_config.equilibration_time = f"{equib_time}ps"
-somd2_config.production_time = f"{prod_time}ps"
+somd2_config.runtime = f"{prod_time}ps"
 somd2_config.frame_frequency = f"{frame_freq}ps"
 somd2_config.checkpoint_frequency = f"{checkpoint_freq}ps"
 
 somd2_config.timestep = "4fs"
 somd2_config.equilibration_timestep = "2fs"
-somd2_config.energy_frequency = "2ps"
+somd2_config.energy_frequency = "1ps"
 somd2_config.cutoff = "10A"
 somd2_config.cutoff_type = "PME"
 
 
 somd2_config.equilibration_constraints = True
-somd2_config.ghost_modifications = False
 somd2_config.num_energy_neighbours = 1
 somd2_config.h_mass_factor = 3
 somd2_config.rest2_scale = 1
@@ -186,19 +211,27 @@ somd2_config.replica_exchange = True
 somd2_config.log_level = "debug"
 somd2_config.save_xml = True
 
-somd2_config.save_energy_components = False
+somd2_config.constraint = "bonds"
 
-somd2_config.timeout = "30 s"
-somd2_config.shift_delta = f"1.5A"
-somd2_config.shift_coulomb = f"1A"
+somd2_config.timeout = "30s"
+somd2_config.shift_delta = "1.5A"
+somd2_config.shift_coulomb = "1A"
 
 
-context = SimulationContext(system=f"{edge_config.output_dir}/{leg_name}.bss", somd2_config=somd2_config)
+context = SimulationContext(
+    system=f"{edge_config.output_dir}/{leg_name}.bss", somd2_config=somd2_config
+)
 
 setup_logging(log_path=f"{context.somd2_config.output_directory}/alchemate.log")
 
 simulation_workflow = [
-    # OptimizeLambdaProbabilities(optimization_attempts=10, optimization_target="repex_matrix", optimization_threshold=0.10, optimization_runtime="500ps", vacuum_optimization=False),
+    # OptimizeLambdaProbabilities(
+    #     optimization_attempts=10,
+    #     optimization_target="repex_matrix",
+    #     optimization_threshold=0.10,
+    #     optimization_runtime="500ps",
+    #     vacuum_optimization=False,
+    # ),
     RunBasicCalculation(calculation_runtime=f"{prod_time}ps"),
 ]
 
