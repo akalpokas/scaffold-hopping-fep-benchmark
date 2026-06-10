@@ -12,7 +12,7 @@ AVAILABLE_MODULES = {
     "ddG": ddGAnalyzer(),
 }
 
-def run_analysis(network_path: Path, active_modules: list, protocol: str, k: str, de: str):
+def run_analysis(network_path: Path, active_modules: list, protocol: str, k: str, de: str, modifiers: str):
     with open(network_path, 'r') as f:
         edges_data = json.load(f)
 
@@ -37,7 +37,7 @@ def run_analysis(network_path: Path, active_modules: list, protocol: str, k: str
         # 1 & 2: Replicate and Leg Level
         for leg in legs_to_run:
             for rep in replicates_to_run:
-                run_folder = f"{leg}_k_{k}_de_{de}_{protocol}_protocol_repl_{rep}"
+                run_folder = f"{leg}_k_{k}_{modifiers}_de_{de}_{protocol}_protocol_repl_{rep}"
                 run_dir = edge_dir / run_folder
                 
                 if run_dir.exists():
@@ -72,10 +72,17 @@ if __name__ == "__main__":
                         help="Leg to run: 'free', 'bound', or 'both' (default)")
     
     parser.add_argument("--replicate", required=False, type=int, help="Optional: Specific replicate number to run (default: runs 1, 2, and 3)")
+
+    parser.add_argument(
+        "--modifiers",
+        type=str,        required=False,
+        default="",
+        help="Optional string of modifiers to include in the run folder name (e.g., 'ghost' if --ghost_modifications is set)"
+    )
     
     args = parser.parse_args()
     
     # Instantiate the requested modules
     active_modules = [AVAILABLE_MODULES[m] for m in args.modules]
     
-    run_analysis(args.network, active_modules, args.protocol, args.k, args.de)
+    run_analysis(args.network, active_modules, args.protocol, args.k, args.de, args.modifiers)

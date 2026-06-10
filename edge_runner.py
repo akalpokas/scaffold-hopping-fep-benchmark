@@ -169,7 +169,7 @@ if protocol == "testing":
     somd2_config.save_crash_report = True
     somd2_config.save_energy_components = True
 elif protocol == "prod":
-    equib_time = 1000
+    equib_time = 500
     prod_time = 10000
     frame_freq = 250
     checkpoint_freq = 1000
@@ -204,7 +204,7 @@ somd2_config.cutoff_type = "PME"
 
 
 somd2_config.equilibration_constraints = True
-somd2_config.num_energy_neighbours = 1
+somd2_config.num_energy_neighbours = 5
 somd2_config.h_mass_factor = 3
 somd2_config.rest2_scale = 1
 somd2_config.replica_exchange = True
@@ -225,13 +225,13 @@ context = SimulationContext(
 setup_logging(log_path=f"{context.somd2_config.output_directory}/alchemate.log")
 
 simulation_workflow = [
-    # OptimizeLambdaProbabilities(
-    #     optimization_attempts=10,
-    #     optimization_target="repex_matrix",
-    #     optimization_threshold=0.10,
-    #     optimization_runtime="500ps",
-    #     vacuum_optimization=False,
-    # ),
+    OptimizeLambdaProbabilities(
+        optimization_attempts=10,
+        optimization_target="overlap_matrix",
+        optimization_threshold=0.03,
+        optimization_runtime="500ps",
+        vacuum_optimization=False,
+    ),
     RunBasicCalculation(calculation_runtime=f"{prod_time}ps"),
 ]
 
