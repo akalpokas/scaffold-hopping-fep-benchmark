@@ -1,5 +1,8 @@
 # scaffold-hopping-fep-benchmark
 
+> [!CAUTION]
+> The code in this repository is under active development and is not yet ready for general use.
+
 # Instructions
 
 Tools - Use them to process a network from start to finish.  
