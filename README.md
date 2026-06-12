@@ -39,6 +39,94 @@ apptainer run --nv /path/to/alchemate_rb.sif python script.py # or somd2 system.
 
 # Runtime Instructions
 
+## Setting Up the RBFE Pipeline
+
+RBFE pipeline relies on a `network.json` file to define the transformations (edges) between different ligands. This file dictates the input files, forcefields, atom mappings, and system parameters required for each simulation. Pre-built networks are provided in the [networks](networks/) folder. Pipeline uses Pydantic validation to ensure the configurations are correct.
+
+## network.json Structure
+
+The `network.json` file contains a list of transformation objects. Each object represents a single edge in your RBFE perturbation network.
+
+Below is a breakdown of the required and optional fields for each transformation object.
+1. Identifiers and Metadata
+
+    edge_id (String, Required): A unique identifier for this specific transformation. Example: "chk1_c20_to_c17".
+    metadata (Dictionary, Required): Contains pipeline control parameters alongside optional tracking information.
+        notes (String, Required): The pipeline relies on this string to determine the alignment merging behavior and the lambda schedule. It must contain one of the following specific phrases:
+            "standard morph": Executes a standard alignment merge and assigns the standard_morph lambda schedule.
+            "bond annihilation": Executes a bond-breaking merge (allowing ring breaking and ring size changes) and assigns the `ring_break_morph` lambda schedule.
+            "bond creation": Executes a bond-breaking merge (allowing ring breaking and ring size changes) and assigns the `ring_make_morph_reverse` lambda schedule.
+        Other keys (Optional): You can safely add custom key-value pairs here for your own tracking, such as `experimental_ddg_kcal_mol` .
+
+2. Input Files
+
+The pipeline requires the coordinates and topologies of the system. Multiple files (like a coordinate file and a topology file) can be provided by passing them as a list of strings.
+
+    ligand_a_paths (List of Strings, Required): File paths to Ligand A (e.g., ["inputs/ligands/ligA.sdf"]).
+    ligand_b_paths (List of Strings, Required): File paths to Ligand B (e.g., ["inputs/ligands/ligB.sdf"]).
+    protein_paths (List of Strings, Required): File paths to the target protein (e.g., ["inputs/proteins/protein.pdb"]).
+
+3. Atom Mapping
+
+    mapping (Dictionary, Required): Defines which atoms in Ligand A correspond to which atoms in Ligand B. The keys represent the atom indices of Ligand A, and the values represent the corresponding atom indices of Ligand B.
+
+4. Forcefield Selection
+
+    ligand_ff (String, Optional): The forcefield used to parameterize the ligands. Defaults to "gaff2". Supported values:
+        "openff" (OpenFF forcefield)
+        "gaff2" (General AMBER Force Field 2)
+        "pre_parametrized" (Use when providing custom topologies)
+
+    protein_ff (String, Optional): The forcefield used to parameterize the protein. Defaults to "amber14". Supported values:
+        "amber14" (AMBER14SB)
+        "pre_parametrized" (Use when providing custom topologies)
+
+5. Solvation Parameters (Optional)
+
+If you do not specify these, the pipeline defaults to standard solvation settings.
+    solvent_padding_nm (Float, Optional): The padding distance (in nanometers) between the protein and the edge of the solvent box. Must be ≥0.0. Default is 1.5.
+    ionic_strength_molar (Float, Optional): The ionic strength of the solvent (in molarity) used to neutralize the system. Must be ≥0.0. Default is 0.15.
+
+## How to Setup and Run the a Custom RBFE Pipeline
+
+To execute an RBFE calculation, follow these steps:
+
+### Step 1: Prepare Inputs
+Ensure protein and ligand structures are protonated, properly formatted (e.g., .pdb, .sdf, or .mol2), and placed in an accessible inputs/ directory.
+
+### Step 2: Generate Atom Mappings
+Determine the common core between your ligand pairs.
+
+### Step 3: Construct network.json
+Create the network.json file defining all the edges in your perturbation graph. Here is an example of what a single, fully configured edge looks like:
+JSON
+
+[
+  {
+    "edge_id": "ligA_to_ligB",
+    "metadata": {
+      "experimental_ddg_kcal_mol": -0.51,
+      "notes": "Bond annihilation"
+    },
+    "protein_ff": "amber14",
+    "ligand_ff": "gaff2",
+    "solvent_padding_nm": 1.5,
+    "ionic_strength_molar": 0.15,
+    "output_dir": "prepared_outputs/target_x/ligA_to_ligB",
+    "mapping": {
+      "0": 10,
+      "1": 9,
+      "2": 11
+    },
+    "ligand_a_paths": ["inputs/ligands/ligA.sdf"],
+    "ligand_b_paths": ["inputs/ligands/ligB.sdf"],
+    "protein_paths": ["inputs/proteins/protein_water.pdb"]
+  }
+]
+
+## Step 4: Execute the Pipeline
+Once the JSON is created, pass it to the pipeline execution scripts.
+
 Tools - Use them to process a network from start to finish.  
 Templates - Modify them once to align to specific HPC or simulation processing needs.
 
@@ -51,7 +139,7 @@ Templates - Modify them once to align to specific HPC or simulation processing n
 | `edge_runner.py` | Template | Runs the alchemical transformation using alchemate workflows and SOMD2 |
 | `clean_runs.py` | Tool | Convenience script for removing previously ran simulations with a specific protocol |
 
-## Alchemical input generation
+### Alchemical input generation
 To process the mappings for a given network:
 ```python
 python rbfe_pipeline_prep.py map --network network.json
@@ -68,13 +156,13 @@ To run the full parametrisation stage and alchemical setup:
 python rbfe_pipeline_prep.py setup --network network.json
 ```
 
-## Network Deployment
+### Network Deployment
 To deploy a single replicate testing protocol run for free and bound legs:
 ```python
 python deploy.py --network networks/zou_network.json --protocol testing --leg both --replicate 1
 ```
 
-## Analysis
+### Analysis
 
 To run a basic analysis workflow on all 1st free leg replicates in a given network:
 ```python
