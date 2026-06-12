@@ -50,42 +50,42 @@ The `network.json` file contains a list of transformation objects. Each object r
 Below is a breakdown of the required and optional fields for each transformation object.
 1. Identifiers and Metadata
 
-    edge_id (String, Required): A unique identifier for this specific transformation. Example: "chk1_c20_to_c17".
-    metadata (Dictionary, Required): Contains pipeline control parameters alongside optional tracking information.
-        notes (String, Required): The pipeline relies on this string to determine the alignment merging behavior and the lambda schedule. It must contain one of the following specific phrases:
-            "standard morph": Executes a standard alignment merge and assigns the standard_morph lambda schedule.
-            "bond annihilation": Executes a bond-breaking merge (allowing ring breaking and ring size changes) and assigns the `ring_break_morph` lambda schedule.
-            "bond creation": Executes a bond-breaking merge (allowing ring breaking and ring size changes) and assigns the `ring_make_morph_reverse` lambda schedule.
-        Other keys (Optional): You can safely add custom key-value pairs here for your own tracking, such as `experimental_ddg_kcal_mol` .
+    - `edge_id` (String, Required): A unique identifier for this specific transformation. Example: "chk1_c20_to_c17".
+    - `metadata` (Dictionary, Required): Contains pipeline control parameters alongside optional tracking information.
+        - `notes` (String, Required): The pipeline relies on this string to determine the alignment merging behavior and the lambda schedule. It must contain one of the following specific phrases:
+            - `"standard morph"`: Executes a standard alignment merge and assigns the standard_morph lambda schedule.
+            - `"bond annihilation"`: Executes a bond-breaking merge (allowing ring breaking and ring size changes) and assigns the `ring_break_morph` lambda schedule.
+            - `"bond creation"`: Executes a bond-breaking merge (allowing ring breaking and ring size changes) and assigns the `ring_make_morph_reverse` lambda schedule.
+        - Other keys (Optional): You can add custom key-value pairs here for your own tracking, such as `experimental_ddg_kcal_mol`.
 
 2. Input Files
 
-The pipeline requires the coordinates and topologies of the system. Multiple files (like a coordinate file and a topology file) can be provided by passing them as a list of strings.
+    The pipeline requires the coordinates and topologies of the system. Multiple files (like a coordinate file and a topology file) can be provided by passing them as a list of strings.
 
-    ligand_a_paths (List of Strings, Required): File paths to Ligand A (e.g., ["inputs/ligands/ligA.sdf"]).
-    ligand_b_paths (List of Strings, Required): File paths to Ligand B (e.g., ["inputs/ligands/ligB.sdf"]).
-    protein_paths (List of Strings, Required): File paths to the target protein (e.g., ["inputs/proteins/protein.pdb"]).
+    - `ligand_a_paths` (List of Strings, Required): File paths to Ligand A (e.g., ["inputs/ligands/ligA.sdf"]).
+    - `ligand_b_paths` (List of Strings, Required): File paths to Ligand B (e.g., ["inputs/ligands/ligB.sdf"]).
+    - `protein_paths` (List of Strings, Required): File paths to the target protein (e.g., ["inputs/proteins/protein.pdb"]).
 
 3. Atom Mapping
 
-    mapping (Dictionary, Required): Defines which atoms in Ligand A correspond to which atoms in Ligand B. The keys represent the atom indices of Ligand A, and the values represent the corresponding atom indices of Ligand B.
+    - `mapping` (Dictionary, Required): Defines which atoms in Ligand A correspond to which atoms in Ligand B. The keys represent the atom indices of Ligand A, and the values represent the corresponding atom indices of Ligand B.
 
 4. Forcefield Selection
 
-    ligand_ff (String, Optional): The forcefield used to parameterize the ligands. Defaults to "gaff2". Supported values:
-        "openff" (OpenFF forcefield)
-        "gaff2" (General AMBER Force Field 2)
-        "pre_parametrized" (Use when providing custom topologies)
+    - `ligand_ff` (String, Optional): The forcefield used to parameterize the ligands. Defaults to "gaff2". Supported values:
+        - `"openff"` (OpenFF forcefield)
+        - `"gaff2"` (General AMBER Force Field 2)
+        - `"pre_parametrized"` (Use when providing custom topologies)
 
-    protein_ff (String, Optional): The forcefield used to parameterize the protein. Defaults to "amber14". Supported values:
-        "amber14" (AMBER14SB)
-        "pre_parametrized" (Use when providing custom topologies)
+    - `protein_ff` (String, Optional): The forcefield used to parameterize the protein. Defaults to "amber14". Supported values:
+        - `"amber14"` (AMBER14SB)
+        - `"pre_parametrized"` (Use when providing custom topologies)
 
 5. Solvation Parameters (Optional)
 
 If you do not specify these, the pipeline defaults to standard solvation settings.
-    solvent_padding_nm (Float, Optional): The padding distance (in nanometers) between the protein and the edge of the solvent box. Must be ≥0.0. Default is 1.5.
-    ionic_strength_molar (Float, Optional): The ionic strength of the solvent (in molarity) used to neutralize the system. Must be ≥0.0. Default is 0.15.
+- `solvent_padding_nm` (Float, Optional): The padding distance (in nanometers) between the protein and the edge of the solvent box. Must be ≥0.0. Default is 1.5.
+- `ionic_strength_molar` (Float, Optional): The ionic strength of the solvent (in molarity) used to neutralize the system. Must be ≥0.0. Default is 0.15.
 
 ## How to Setup and Run the a Custom RBFE Pipeline
 
@@ -99,6 +99,7 @@ Determine the common core between your ligand pairs.
 
 ### Step 3: Construct network.json
 Create the network.json file defining all the edges in your perturbation graph. Here is an example of what a single, fully configured edge looks like:
+```
 JSON
 
 [
@@ -123,6 +124,7 @@ JSON
     "protein_paths": ["inputs/proteins/protein_water.pdb"]
   }
 ]
+```
 
 ## Step 4: Execute the Pipeline
 Once the JSON is created, pass it to the pipeline execution scripts.
