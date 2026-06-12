@@ -226,7 +226,7 @@ simulation_workflow = [
     OptimizeLambdaProbabilities(
         optimization_attempts=10,
         optimization_target="overlap_matrix",
-        optimization_threshold=0.03,
+        optimization_threshold=0.1,
         optimization_runtime="500ps",
         vacuum_optimization=False,
     ),
