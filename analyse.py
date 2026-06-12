@@ -58,7 +58,7 @@ def run_analysis(network_path: Path, active_modules: list, protocol: str, k: str
         print("") # Formatting newline
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Extensible Analysis Router")
+    parser = argparse.ArgumentParser(description="Network-wide analysis script for RBFE benchmarks. Run folders should be organized as: <edge_output_dir>/<leg>_k_<k>_<modifiers>_de_<de>_<protocol>_protocol_repl_<replicate>/")
     parser.add_argument("--network", required=True, type=Path)
     parser.add_argument("--protocol", required=True, type=str)
     
@@ -66,8 +66,8 @@ if __name__ == "__main__":
     parser.add_argument("--modules", nargs="+", choices=AVAILABLE_MODULES.keys(), default=["energy_traj"],
                         help="List of analysis modules to run (e.g., --modules energy_traj convergence)")
     
-    parser.add_argument("--k", default="125", type=str)
-    parser.add_argument("--de", default="150", type=str)
+    parser.add_argument("--k", default="125", type=str, help="Soft Morse bond strength parameter for the run. Default is 125 kcal/mol/A^2.")
+    parser.add_argument("--de", default="50", type=str, help="Soft Morse dissociation energy parameter for the run. Default is 50 kcal/mol.")
     parser.add_argument("--leg_name", required=False, default="both", type=str, choices=["free", "bound", "both"],
                         help="Leg to run: 'free', 'bound', or 'both' (default)")
     

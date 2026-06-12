@@ -74,7 +74,6 @@ def get_user_input():
     )
 
 
-
 if __name__ == "__main__":
     (
         network,
@@ -98,7 +97,6 @@ if not edge_dict:
 
 # validate schema
 edge_config = RBFEEdge(**edge_dict)
-
 
 
 somd2_config = Config()

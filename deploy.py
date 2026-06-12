@@ -122,19 +122,19 @@ if __name__ == "__main__":
         "--bond_strength",
         type=int,
         default=125,
-        help="Soft Morse bond strength parameter for the run",
+        help="Soft Morse bond strength parameter for the run. Default is 125 kcal/mol/A^2.",
     )
     parser.add_argument(
         "--de_strength",
         type=int,
         default=50,
-        help="Soft Morse dissociation energy parameter for the run",
+        help="Soft Morse dissociation energy parameter for the run. Default is 50 kcal/mol.",
     )
 
     parser.add_argument(
         "--ghost_modifications",
         action="store_true",
-        help="Whether to apply ghost modifications to the system. If not provided, ghost modifications will not be applied",
+        help="Whether to apply ghost modifications to the system. If not provided, ghost modifications will not be applied.",
     )
 
     args = parser.parse_args()

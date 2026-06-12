@@ -6,7 +6,7 @@ from unittest.mock import patch
 from pathlib import Path
 from enum import Enum
 from typing import Any, Dict, Optional
-from pydantic import BaseModel, FilePath, Field
+from pydantic import BaseModel, Field, FilePath, field_validator
 import BioSimSpace as BSS
 import sire as sr
 
@@ -56,6 +56,24 @@ class RBFEEdge(BaseModel):
     )
 
     output_dir: Path = Field(..., description="Directory to save the outputs")
+
+    @field_validator('metadata')
+    @classmethod
+    def validate_metadata_notes(cls, v: Dict[str, Any]) -> Dict[str, Any]:
+        """Validates that the metadata dictionary contains the required 'notes' string."""
+        if "notes" not in v:
+            raise ValueError("The 'metadata' dictionary must contain a 'notes' key.")
+
+        notes = str(v["notes"]).lower()
+        valid_phrases = ["standard morph", "bond annihilation", "bond creation"]
+
+        if not any(phrase in notes for phrase in valid_phrases):
+            raise ValueError(
+                f"Metadata 'notes' must contain one of the following phrases: {valid_phrases}. "
+                f"Received: '{v['notes']}'"
+            )
+        
+        return v
 
     def create_output_dir(self):
         """Utility to ensure the working directory exists."""

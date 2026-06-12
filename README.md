@@ -130,17 +130,18 @@ Create the network.json file defining all the edges in your perturbation graph. 
 ## Step 4: Execute the Pipeline
 Once the JSON is created, pass it to the pipeline execution scripts.
 
-> [!NOTE]
+> [!TIP]
 > Network processing tools can be executed granually on different levels:
 > - Network-wise
 > - Edge-wise
 > - Leg-wise
 > - Replicate-wise
 > - Protocol-wise  
-> Meaning that if you want to run edgeA_to_B from network X, but you only want to run the free leg replicate 2 using the protocol Z, the tools are flexible enough to setup and run these simulations.
+>
+> Meaning that if you want to run `edgeA_to_B` from network `X`, but you only want to run the `free leg` replicate `2` using the protocol `Z`, the tools are flexible enough to setup and run these simulations.
 
-Tools - Use them to process a network from start to finish.  
-Templates - Modify them once to align to specific HPC or simulation processing needs.
+`Tools` - Use them to process a network from start to finish.  
+`Templates` - Modify them once to align to specific HPC or simulation processing needs.
 
 | Script    | Type | Purpose |
 | -------- | -------- | ------- |
@@ -152,6 +153,10 @@ Templates - Modify them once to align to specific HPC or simulation processing n
 | `clean_runs.py` | Tool | Convenience script for removing previously ran simulations with a specific protocol |
 
 ### Alchemical input generation
+
+> [!IMPORTANT]
+> Use `python tool.py -h` or `python tool.py --help`  to query the tool for default behaviour. Most tools will default to network-level operations.
+
 To process the mappings for a given network:
 ```python
 python rbfe_pipeline_prep.py map --network network.json
