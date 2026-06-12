@@ -39,6 +39,9 @@ apptainer run --nv /path/to/alchemate_rb.sif python script.py # or somd2 system.
 
 # Runtime Instructions
 
+> [!NOTE]
+> If you are not building your own custom network, you can skip ahead to the [Step 4: Execute the Pipeline](#step-4:-execute-the-pipeline)
+
 ## Setting Up the RBFE Pipeline
 
 RBFE pipeline relies on a `network.json` file to define the transformations (edges) between different ligands. This file dictates the input files, forcefields, atom mappings, and system parameters required for each simulation. Pre-built networks are provided in the [networks](networks/) folder. Pipeline uses Pydantic validation to ensure the configurations are correct.
@@ -99,9 +102,7 @@ Determine the common core between your ligand pairs.
 
 ### Step 3: Construct network.json
 Create the network.json file defining all the edges in your perturbation graph. Here is an example of what a single, fully configured edge looks like:
-```
-JSON
-
+```JSON
 [
   {
     "edge_id": "ligA_to_ligB",
