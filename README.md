@@ -3,7 +3,41 @@
 > [!CAUTION]
 > The code in this repository is under active development and is not yet ready for general use.
 
-# Instructions
+# Software Instructions
+
+## Prerequisites
+1. Install docker. See https://docs.docker.com/engine/install/
+
+2. The production pixi/conda environment `sire` shipped in the container is built with `cudatoolkit/cuda-version` version of `12.6` meaning that your compute machine needs a minimum NVIDIA driver version of 560. See https://docs.nvidia.com/cuda/cuda-toolkit-release-notes/
+
+3. To enable GPU support in the container, please make sure that NVIDIA Container Toolkit is installed on your compute machine. Instructions are provided here: https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/latest/install-guide.html
+
+4. For production simulations (multi-user systems, HPCs, etc), use `apptainer` to simplify the execution process. For ubuntu it's recommended to install `apptainer` via `.deb` install as it will update apparmour profiles to allow for seamless image execution. See https://github.com/apptainer/apptainer/blob/main/INSTALL.md#apparmor-profile-ubuntu-2310 for more details.
+
+## Interactive Docker Run
+
+Run interactive docker session
+
+```bash
+docker run -it --gpus all akalpokas/alchemate_rb:latest
+```
+
+## Production Apptainer Run
+
+```bash
+apptainer pull alchemate_rb.sif docker://akalpokas/alchemate_rb:latest # run once
+apptainer run --nv /path/to/alchemate_rb.sif python script.py # or somd2 system.bss
+```
+
+## Setup software
+`biosimspace - 2026.1.0.dev0` (conda install)
+`sire - 2026.1.0.dev0`        (conda install)
+
+## Run images
+- Default: [2026.06.11](https://hub.docker.com/repository/docker/akalpokas/alchemate_rb/tags/2026.06.11)
+- REST2 Angle Tempering: To be built
+
+# Runtime Instructions
 
 Tools - Use them to process a network from start to finish.  
 Templates - Modify them once to align to specific HPC or simulation processing needs.
@@ -44,7 +78,7 @@ python deploy.py --network networks/zou_network.json --protocol testing --leg bo
 
 To run a basic analysis workflow on all 1st free leg replicates in a given network:
 ```python
-python analyse.py --network networks/zou_network.json --modules energy_traj --protocol testing --leg_name free --k 125 --de 150 --replicate 1
+python analyse.py --network networks/zou_network.json --modules energy_traj --protocol testing --leg_name free --k 125 --de 50 --replicate 1
 ```
 
 # Data Flow
@@ -116,13 +150,3 @@ flowchart TD
     MD -->|Analysed by| Analyse
     Analyse -->| Produces | FinalData
 ```
-
-# Software versioning
-
-## Setup software
-`biosimspace - 2026.1.0.dev0` (conda install)
-`sire - 2026.1.0.dev0`        (conda install)
-
-## Run images
-- Default: [2026.05.20](https://hub.docker.com/repository/docker/akalpokas/alchemate_rb/tags/2026.05.20)
-- REST2 Angle Tempering: 
