@@ -90,7 +90,7 @@ If you do not specify these, the pipeline defaults to standard solvation setting
 - `solvent_padding_nm` (Float, Optional): The padding distance (in nanometers) between the protein and the edge of the solvent box. Must be ≥0.0. Default is 1.5.
 - `ionic_strength_molar` (Float, Optional): The ionic strength of the solvent (in molarity) used to neutralize the system. Must be ≥0.0. Default is 0.15.
 
-## How to Setup and Run the a Custom RBFE Pipeline
+## How to Setup and Run a Custom RBFE Pipeline
 
 To execute an RBFE calculation, follow these steps:
 
@@ -130,6 +130,15 @@ Create the network.json file defining all the edges in your perturbation graph. 
 ## Step 4: Execute the Pipeline
 Once the JSON is created, pass it to the pipeline execution scripts.
 
+> [!NOTE]
+> Network processing tools can be executed granually on different levels:
+> - Network-wise
+> - Edge-wise
+> - Leg-wise
+> - Replicate-wise
+> - Protocol-wise  
+> Meaning that if you want to run edgeA_to_B from network X, but you only want to run the free leg replicate 2 using the protocol Z, the tools are flexible enough to setup and run these simulations.
+
 Tools - Use them to process a network from start to finish.  
 Templates - Modify them once to align to specific HPC or simulation processing needs.
 
@@ -164,6 +173,13 @@ To deploy a single replicate testing protocol run for free and bound legs:
 ```python
 python deploy.py --network networks/zou_network.json --protocol testing --leg both --replicate 1
 ```
+
+Currently implemented protocols
+| Protocol | Purpose |
+| -------- | ------- |
+| `testing` | Runs a short simulation to test stability of the edge and records force components for crash debugging |
+| `prod` | Runs a full production simulation with high performance settings |
+| `long` | Same as `prod` above, however this protocol is meant for longer sampling of transformations that might be harder to convege |
 
 ### Analysis
 
