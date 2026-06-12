@@ -40,7 +40,7 @@ apptainer run --nv /path/to/alchemate_rb.sif python script.py # or somd2 system.
 # Runtime Instructions
 
 > [!NOTE]
-> If you are not building your own custom network, you can skip ahead to the [Step 4: Execute the Pipeline](#step-4:-execute-the-pipeline)
+> If you are not building your own custom network, you can skip ahead to the [Step 4: Execute the Pipeline](#step-4-execute-the-pipeline)
 
 ## Setting Up the RBFE Pipeline
 
