@@ -74,7 +74,7 @@ def get_user_input():
     )
 
 
-if __name__ == "__main__":
+def main():
     (
         network,
         edge_id,
@@ -86,152 +86,144 @@ if __name__ == "__main__":
         ghost_modifications,
     ) = get_user_input()
 
+    # Load the edge information from the network file
+    with open(network, "r") as f:
+        network_data = json.load(f)
+    edge_dict = next((item for item in network_data if item["edge_id"] == edge_id), None)
 
-# Load the edge information from the network file
-with open(network, "r") as f:
-    network_data = json.load(f)
-edge_dict = next((item for item in network_data if item["edge_id"] == edge_id), None)
+    if not edge_dict:
+        raise ValueError(f"Edge {edge_id} not found in {network}")
 
-if not edge_dict:
-    raise ValueError(f"Edge {edge_id} not found in {network}")
+    # validate schema
+    edge_config = RBFEEdge(**edge_dict)
 
-# validate schema
-edge_config = RBFEEdge(**edge_dict)
+    somd2_config = Config()
+    somd2_config.lambda_values = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
 
+    sire_system = sr.stream.load(f"{edge_config.output_dir}/{leg_name}.bss")
 
-somd2_config = Config()
-somd2_config.lambda_values = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+    # attempt to determine the lambda schedule based on edge metadata
+    metadata = edge_config.metadata
 
-sire_system = sr.stream.load(f"{edge_config.output_dir}/{leg_name}.bss")
+    if (
+        metadata
+        and "notes" in metadata
+        and "bond annihilation" in metadata["notes"].lower()
+    ):
+        somd2_config.lambda_schedule = "ring_break_morph"
+        bond_alchemy = True
+    elif metadata and "notes" in metadata and "bond creation" in metadata["notes"].lower():
+        somd2_config.lambda_schedule = "ring_make_morph_reverse"
+        bond_alchemy = True
+    elif metadata and "notes" in metadata and "standard morph" in metadata["notes"].lower():
+        somd2_config.lambda_schedule = "standard_morph"
+        bond_alchemy = False
+    else:
+        raise ValueError(f"""Unable to determine lambda schedule from edge metadata.
+                        Please ensure that the 'notes' field in the edge metadata contains one of the following:
+                        'bond annihilation', 'bond creation', or 'standard morph'.
+                        Edge metadata: {metadata}""")
 
+    if bond_alchemy:
+        hard_restraints, sire_system = sr.restraints.morse_potential(
+            sire_system,
+            de="150 kcal mol-1",
+            auto_parametrise=True,
+            direct_morse_replacement=True,
+            name="morse_hard",
+        )
+        print(hard_restraints)
 
-# attempt to determine the lambda schedule based on edge metadata, e.g
-#     "edge_id": "chk1_c20_to_c17",
-#     "metadata": {
-#       "experimental_ddg_kcal_mol": -0.51,
-#       "notes": "Bond annihilation"
-#     },
+        soft_restraints, _ = sr.restraints.morse_potential(
+            sire_system,
+            atoms0=hard_restraints[0].atom0(),
+            atoms1=hard_restraints[0].atom1(),
+            r0=hard_restraints[0].r0(),
+            k=f"{bond_strength} kcal mol-1 A-2",
+            auto_parametrise=False,
+            de=f"{de_strength} kcal mol-1",
+            name="morse_soft",
+        )
+        print(soft_restraints)
+        somd2_config.restraints = [hard_restraints, soft_restraints]
+        
+    print(f"Sire system type:{type(sire_system)}")
 
-metadata = edge_config.metadata
+    if protocol == "testing":
+        equib_time = 100
+        prod_time = 1000
+        frame_freq = 250
+        checkpoint_freq = 500
 
-if (
-    metadata
-    and "notes" in metadata
-    and "bond annihilation" in metadata["notes"].lower()
-):
-    somd2_config.lambda_schedule = "ring_break_morph"
-    bond_alchemy = True
-elif metadata and "notes" in metadata and "bond creation" in metadata["notes"].lower():
-    somd2_config.lambda_schedule = "ring_make_morph_reverse"
-    bond_alchemy = True
-elif metadata and "notes" in metadata and "standard morph" in metadata["notes"].lower():
-    somd2_config.lambda_schedule = "standard_morph"
-    bond_alchemy = False
-else:
-    raise ValueError(f"""Unable to determine lambda schedule from edge metadata.
-                    Please ensure that the 'notes' field in the edge metadata contains one of the following:
-                    'bond annihilation', 'bond creation', or 'standard morph'.
-                    Edge metadata: {metadata}""")
+        somd2_config.save_crash_report = True
+        somd2_config.save_energy_components = True
+    elif protocol == "prod":
+        equib_time = 500
+        prod_time = 10000
+        frame_freq = 250
+        checkpoint_freq = 1000
+    elif protocol == "long":
+        equib_time = 1000
+        prod_time = 25000
+        frame_freq = 250
+        checkpoint_freq = 1000
+    else:
+        raise ValueError(
+            f"Invalid protocol: {protocol}. Options are: 'testing', 'prod', 'long'"
+        )
 
-if bond_alchemy:
-    hard_restraints, sire_system = sr.restraints.morse_potential(
-        sire_system,
-        de="150 kcal mol-1",
-        auto_parametrise=True,
-        direct_morse_replacement=True,
-        name="morse_hard",
+    if ghost_modifications:
+        somd2_config.ghost_modifications = True
+        mods_prefix = "ghost_mods"
+    else:
+        somd2_config.ghost_modifications = False
+        mods_prefix = ""
+
+    somd2_config.output_directory = f"{edge_config.output_dir}/{leg_name}_k_{int(bond_strength)}_{mods_prefix}_cress_input_de_{int(de_strength)}_{protocol}_protocol_repl_{replicate}"
+    somd2_config.equilibration_time = f"{equib_time}ps"
+    somd2_config.runtime = f"{prod_time}ps"
+    somd2_config.frame_frequency = f"{frame_freq}ps"
+    somd2_config.checkpoint_frequency = f"{checkpoint_freq}ps"
+
+    somd2_config.timestep = "4fs"
+    somd2_config.equilibration_timestep = "2fs"
+    somd2_config.energy_frequency = "1ps"
+    somd2_config.cutoff = "10A"
+    somd2_config.cutoff_type = "PME"
+
+    somd2_config.equilibration_constraints = True
+    somd2_config.num_energy_neighbours = 5
+    somd2_config.h_mass_factor = 3
+    somd2_config.rest2_scale = 1
+    somd2_config.replica_exchange = True
+    somd2_config.log_level = "debug"
+    somd2_config.save_xml = True
+
+    somd2_config.constraint = "bonds"
+
+    somd2_config.timeout = "30s"
+    somd2_config.shift_delta = "1.5A"
+    somd2_config.shift_coulomb = "1A"
+
+    context = SimulationContext(
+        system=f"{edge_config.output_dir}/{leg_name}.bss", somd2_config=somd2_config
     )
-    print(hard_restraints)
 
-    soft_restraints, _ = sr.restraints.morse_potential(
-        sire_system,
-        atoms0=hard_restraints[0].atom0(),
-        atoms1=hard_restraints[0].atom1(),
-        r0=hard_restraints[0].r0(),
-        k=f"{bond_strength} kcal mol-1 A-2",
-        auto_parametrise=False,
-        de=f"{de_strength} kcal mol-1",
-        name="morse_soft",
-    )
-    print(soft_restraints)
-    somd2_config.restraints = [hard_restraints, soft_restraints]
-print(f"Sire system type:{type(sire_system)}")
+    setup_logging(log_path=f"{context.somd2_config.output_directory}/alchemate.log")
 
+    simulation_workflow = [
+        OptimizeLambdaProbabilities(
+            optimization_attempts=10,
+            optimization_target="overlap_matrix",
+            optimization_threshold=0.1,
+            optimization_runtime="500ps",
+            vacuum_optimization=False,
+        ),
+        RunBasicCalculation(calculation_runtime=f"{prod_time}ps"),
+    ]
 
-if protocol == "testing":
-    equib_time = 100
-    prod_time = 1000
-    frame_freq = 250
-    checkpoint_freq = 500
+    manager = WorkflowManager(context=context, workflow_steps=simulation_workflow)
+    final_context = manager.execute()
 
-    somd2_config.save_crash_report = True
-    somd2_config.save_energy_components = True
-elif protocol == "prod":
-    equib_time = 500
-    prod_time = 10000
-    frame_freq = 250
-    checkpoint_freq = 1000
-elif protocol == "long":
-    equib_time = 1000
-    prod_time = 25000
-    frame_freq = 250
-    checkpoint_freq = 1000
-else:
-    raise ValueError(
-        f"Invalid protocol: {protocol}. Options are: 'testing', 'prod', 'long'"
-    )
-
-if ghost_modifications:
-    somd2_config.ghost_modifications = True
-    mods_prefix = "ghost_mods"
-else:
-    somd2_config.ghost_modifications = False
-    mods_prefix = ""
-
-somd2_config.output_directory = f"{edge_config.output_dir}/{leg_name}_k_{int(bond_strength)}_{mods_prefix}_de_{int(de_strength)}_{protocol}_protocol_repl_{replicate}"
-somd2_config.equilibration_time = f"{equib_time}ps"
-somd2_config.runtime = f"{prod_time}ps"
-somd2_config.frame_frequency = f"{frame_freq}ps"
-somd2_config.checkpoint_frequency = f"{checkpoint_freq}ps"
-
-somd2_config.timestep = "4fs"
-somd2_config.equilibration_timestep = "2fs"
-somd2_config.energy_frequency = "1ps"
-somd2_config.cutoff = "10A"
-somd2_config.cutoff_type = "PME"
-
-
-somd2_config.equilibration_constraints = True
-somd2_config.num_energy_neighbours = 5
-somd2_config.h_mass_factor = 3
-somd2_config.rest2_scale = 1
-somd2_config.replica_exchange = True
-somd2_config.log_level = "debug"
-somd2_config.save_xml = True
-
-somd2_config.constraint = "bonds"
-
-somd2_config.timeout = "30s"
-somd2_config.shift_delta = "1.5A"
-somd2_config.shift_coulomb = "1A"
-
-
-context = SimulationContext(
-    system=f"{edge_config.output_dir}/{leg_name}.bss", somd2_config=somd2_config
-)
-
-setup_logging(log_path=f"{context.somd2_config.output_directory}/alchemate.log")
-
-simulation_workflow = [
-    OptimizeLambdaProbabilities(
-        optimization_attempts=10,
-        optimization_target="overlap_matrix",
-        optimization_threshold=0.1,
-        optimization_runtime="500ps",
-        vacuum_optimization=False,
-    ),
-    RunBasicCalculation(calculation_runtime=f"{prod_time}ps"),
-]
-
-manager = WorkflowManager(context=context, workflow_steps=simulation_workflow)
-final_context = manager.execute()
+if __name__ == "__main__":
+    main()
