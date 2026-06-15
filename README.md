@@ -29,9 +29,17 @@ apptainer pull alchemate_rb.sif docker://akalpokas/alchemate_rb:latest # run onc
 apptainer run --nv /path/to/alchemate_rb.sif python script.py # or somd2 system.bss
 ```
 
+> [!Important]
+> If you are using apptainer version of 1.5.1 or are getting the following error during the build process:
+> `While making image from oci registry: error fetching image to cache: while building SIF from layers: while creating squashfs: /usr/libexec/apptainer/bin/mksquashfs command failed:`
+> Run:
+> `export APPTAINER_IGNORE_PROOT=1`
+> And rerun the pull command above.
+
 ## Setup software
-`biosimspace - 2026.1.0.dev0` (conda install)
+`biosimspace - 2026.1.0.dev0` (conda install)  
 `sire - 2026.1.0.dev0`        (conda install)
+`conda create -n openbiosim-dev -c conda-forge -c openbiosim/label/dev biosimspace gromacs`
 
 ## Run images
 - Default: [2026.06.11](https://hub.docker.com/repository/docker/akalpokas/alchemate_rb/tags/2026.06.11)
