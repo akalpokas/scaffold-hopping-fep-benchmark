@@ -68,8 +68,12 @@ class ddGAnalyzer(AnalysisModule):
         self.table.add_column("dG Value", style="magenta")
 
         self._mask_optimization_files(run_dir)
-        pmf, overlap = Relative.analyse(str(run_dir))
-        dg = Relative.difference(pmf)[0].value()
+        try:
+            pmf, overlap = Relative.analyse(str(run_dir))
+            dg = Relative.difference(pmf)[0].value()
+        except Exception as e:
+            print(f"Error analyzing replicate {rep} in leg '{leg}': {e}")
+            dg = float('nan')  # Assign NaN if there's an error
 
         self.table.add_row(str(run_dir), str(f"{dg:.2f} kcal/mol"))
         self.console.print(self.table)
