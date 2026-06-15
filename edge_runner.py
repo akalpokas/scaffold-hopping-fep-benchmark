@@ -149,6 +149,7 @@ def main():
         
     print(f"Sire system type:{type(sire_system)}")
 
+    somd2_config.timestep = "4fs"
     if protocol == "testing":
         equib_time = 100
         prod_time = 1000
@@ -162,14 +163,21 @@ def main():
         prod_time = 10000
         frame_freq = 250
         checkpoint_freq = 1000
+    elif protocol == "prod_2fs":
+        equib_time = 500
+        prod_time = 10000
+        frame_freq = 250
+        checkpoint_freq = 1000
+        somd2_config.timestep = "2fs"
     elif protocol == "long":
         equib_time = 1000
         prod_time = 25000
         frame_freq = 250
         checkpoint_freq = 1000
+        
     else:
         raise ValueError(
-            f"Invalid protocol: {protocol}. Options are: 'testing', 'prod', 'long'"
+            f"Invalid protocol: {protocol}. Options are: 'testing', 'prod', 'prod_2fs', 'long'"
         )
 
     if ghost_modifications:
@@ -179,13 +187,13 @@ def main():
         somd2_config.ghost_modifications = False
         mods_prefix = ""
 
-    somd2_config.output_directory = f"{edge_config.output_dir}/{leg_name}_k_{int(bond_strength)}_{mods_prefix}_cress_input_de_{int(de_strength)}_{protocol}_protocol_repl_{replicate}"
+    somd2_config.output_directory = f"{edge_config.output_dir}/{leg_name}_k_{int(bond_strength)}_{mods_prefix}_de_{int(de_strength)}_{protocol}_protocol_repl_{replicate}"
     somd2_config.equilibration_time = f"{equib_time}ps"
     somd2_config.runtime = f"{prod_time}ps"
     somd2_config.frame_frequency = f"{frame_freq}ps"
     somd2_config.checkpoint_frequency = f"{checkpoint_freq}ps"
 
-    somd2_config.timestep = "4fs"
+    
     somd2_config.equilibration_timestep = "2fs"
     somd2_config.energy_frequency = "1ps"
     somd2_config.cutoff = "10A"

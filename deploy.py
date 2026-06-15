@@ -96,7 +96,7 @@ if __name__ == "__main__":
         "--protocol",
         required=True,
         type=str,
-        help="Protocol to run (e.g. 'testing', 'prod', 'long')",
+        help="Protocol to run (e.g. 'testing', 'prod', 'prod_2fs',  'long')",
     )
 
     # Optional arguments with smart defaults

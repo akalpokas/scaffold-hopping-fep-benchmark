@@ -73,7 +73,7 @@ class ddGAnalyzer(AnalysisModule):
             dg = Relative.difference(pmf)[0].value()
         except Exception as e:
             print(f"Error analyzing replicate {rep} in leg '{leg}': {e}")
-            dg = float('nan')  # Assign NaN if there's an error
+            dg = float('nan')
 
         self.table.add_row(str(run_dir), str(f"{dg:.2f} kcal/mol"))
         self.console.print(self.table)
