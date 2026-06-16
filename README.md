@@ -32,7 +32,7 @@ apptainer run --nv /path/to/alchemate_rb.sif python script.py # or somd2 system.
 > [!Important]
 > If you are using apptainer version of 1.5.1 or are getting the following error during the build process:
 > `While making image from oci registry: error fetching image to cache: while building SIF from layers: while creating squashfs: /usr/libexec/apptainer/bin/mksquashfs command failed:`
-> Run:
+> Run:  
 > `export APPTAINER_IGNORE_PROOT=1`
 > And rerun the pull command above.
 
@@ -66,16 +66,16 @@ Below is a breakdown of the required and optional fields for each transformation
         - `notes` (String, Required): The pipeline relies on this string to determine the alignment merging behavior and the lambda schedule. It must contain one of the following specific phrases:
             - `"standard morph"`: Executes a standard alignment merge and assigns the standard_morph lambda schedule.
             - `"bond annihilation"`: Executes a bond-breaking merge (allowing ring breaking and ring size changes) and assigns the `ring_break_morph` lambda schedule.
-            - `"bond creation"`: Executes a bond-breaking merge (allowing ring breaking and ring size changes) and assigns the `ring_make_morph_reverse` lambda schedule.
+            - `"bond creation"`: Executes a bond-breaking merge (allowing ring breaking and ring size changes) and assigns the `reverse_ring_break_morph` lambda schedule.
         - Other keys (Optional): You can add custom key-value pairs here for your own tracking, such as `experimental_ddg_kcal_mol`.
 
 2. Input Files
 
     The pipeline requires the coordinates and topologies of the system. Multiple files (like a coordinate file and a topology file) can be provided by passing them as a list of strings.
 
-    - `ligand_a_paths` (List of Strings, Required): File paths to Ligand A (e.g., ["inputs/ligands/ligA.sdf"]).
-    - `ligand_b_paths` (List of Strings, Required): File paths to Ligand B (e.g., ["inputs/ligands/ligB.sdf"]).
-    - `protein_paths` (List of Strings, Required): File paths to the target protein (e.g., ["inputs/proteins/protein.pdb"]).
+    - `ligand_a_paths` (List of Strings, Required): File paths to Ligand A (e.g., `["inputs/ligands/ligA.sdf"]`).
+    - `ligand_b_paths` (List of Strings, Required): File paths to Ligand B (e.g., `["inputs/ligands/ligB.sdf"]`).
+    - `protein_paths` (List of Strings, Required): File paths to the target protein (e.g., `["inputs/proteins/protein.pdb"]`).
 
 3. Atom Mapping
 
@@ -103,7 +103,7 @@ If you do not specify these, the pipeline defaults to standard solvation setting
 To execute an RBFE calculation, follow these steps:
 
 ### Step 1: Prepare Inputs
-Ensure protein and ligand structures are protonated, properly formatted (e.g., .pdb, .sdf, or .mol2), and placed in an accessible inputs/ directory.
+Ensure protein and ligand structures are protonated, properly formatted (e.g., .pdb, .sdf, or .mol2), and placed in an accessible [inputs](inputs/) directory.
 
 ### Step 2: Generate Atom Mappings
 Determine the common core between your ligand pairs.
@@ -192,6 +192,7 @@ Currently implemented protocols
 | -------- | ------- |
 | `testing` | Runs a short simulation to test stability of the edge and records force components for crash debugging |
 | `prod` | Runs a full production simulation with high performance settings |
+| 'prod_2fs` | Same as above, just with `2fs` production timestep |
 | `long` | Same as `prod` above, however this protocol is meant for longer sampling of transformations that might be harder to convege |
 
 ### Analysis

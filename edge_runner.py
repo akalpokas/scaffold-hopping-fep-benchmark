@@ -113,7 +113,7 @@ def main():
         somd2_config.lambda_schedule = "ring_break_morph"
         bond_alchemy = True
     elif metadata and "notes" in metadata and "bond creation" in metadata["notes"].lower():
-        somd2_config.lambda_schedule = "ring_make_morph_reverse"
+        somd2_config.lambda_schedule = "reverse_ring_break_morph"
         bond_alchemy = True
     elif metadata and "notes" in metadata and "standard morph" in metadata["notes"].lower():
         somd2_config.lambda_schedule = "standard_morph"
