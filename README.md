@@ -192,7 +192,7 @@ Currently implemented protocols
 | -------- | ------- |
 | `testing` | Runs a short simulation to test stability of the edge and records force components for crash debugging |
 | `prod` | Runs a full production simulation with high performance settings |
-| 'prod_2fs` | Same as above, just with `2fs` production timestep |
+| `prod_2fs` | Same as above, just with `2fs` production timestep |
 | `long` | Same as `prod` above, however this protocol is meant for longer sampling of transformations that might be harder to convege |
 
 ### Analysis
