@@ -17,4 +17,4 @@ system1.prm7
 *.pkl
 *.out
 *.xml
-*.pdb
+*.code-workspace
