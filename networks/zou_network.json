@@ -61,13 +61,13 @@
       "47": 30
     },
     "ligand_a_paths": [
-      "inputs/ligands/chk_20.sdf"
+      "inputs/ligands/zou/chk_20.sdf"
     ],
     "ligand_b_paths": [
-      "inputs/ligands/chk_17.sdf"
+      "inputs/ligands/zou/chk_17.sdf"
     ],
     "protein_paths": [
-      "inputs/proteins/chk1_protein_mod_water_name.pdb"
+      "inputs/proteins/zou/chk1_protein_mod_water_name.pdb"
     ]
   },
   {
@@ -133,13 +133,13 @@
       "50": 29
     },
     "ligand_a_paths": [
-      "inputs/ligands/chk_1.sdf"
+      "inputs/ligands/zou/chk_1.sdf"
     ],
     "ligand_b_paths": [
-      "inputs/ligands/chk_19.sdf"
+      "inputs/ligands/zou/chk_19.sdf"
     ],
     "protein_paths": [
-      "inputs/proteins/chk1_protein_mod_water_name.pdb"
+      "inputs/proteins/zou/chk1_protein_mod_water_name.pdb"
     ]
   },
   {
@@ -222,13 +222,13 @@
       "16": 20
     },
     "ligand_a_paths": [
-      "inputs/ligands/facx_4d.sdf"
+      "inputs/ligands/zou/facx_4d.sdf"
     ],
     "ligand_b_paths": [
-      "inputs/ligands/facx_edo.sdf"
+      "inputs/ligands/zou/facx_edo.sdf"
     ],
     "protein_paths": [
-      "inputs/proteins/facx_protein_mod_water_name.pdb"
+      "inputs/proteins/zou/facx_protein_mod_water_name.pdb"
     ]
   },
   {
@@ -311,13 +311,13 @@
       "68": 51
     },
     "ligand_a_paths": [
-      "inputs/ligands/facx_4c.sdf"
+      "inputs/ligands/zou/facx_4c.sdf"
     ],
     "ligand_b_paths": [
-      "inputs/ligands/facx_edo.sdf"
+      "inputs/ligands/zou/facx_edo.sdf"
     ],
     "protein_paths": [
-      "inputs/proteins/facx_protein_mod_water_name.pdb"
+      "inputs/proteins/zou/facx_protein_mod_water_name.pdb"
     ]
   },
   {
@@ -370,13 +370,13 @@
       "25": 0
     },
     "ligand_a_paths": [
-      "inputs/ligands/era_2e.sdf"
+      "inputs/ligands/zou/era_2e.sdf"
     ],
     "ligand_b_paths": [
-      "inputs/ligands/era_3b.sdf"
+      "inputs/ligands/zou/era_3b.sdf"
     ],
     "protein_paths": [
-      "inputs/proteins/era_protein_mod_water_name.pdb"
+      "inputs/proteins/zou/era_protein_mod_water_name.pdb"
     ]
   },
   {
@@ -429,13 +429,13 @@
       "36": 0
     },
     "ligand_a_paths": [
-      "inputs/ligands/era_2d.sdf"
+      "inputs/ligands/zou/era_2d.sdf"
     ],
     "ligand_b_paths": [
-      "inputs/ligands/era_3b.sdf"
+      "inputs/ligands/zou/era_3b.sdf"
     ],
     "protein_paths": [
-      "inputs/proteins/era_protein_mod_water_name.pdb"
+      "inputs/proteins/zou/era_protein_mod_water_name.pdb"
     ]
   },
   {
@@ -502,13 +502,13 @@
       "48": 31
     },
     "ligand_a_paths": [
-      "inputs/ligands/chk_21_rb_intermediate.sdf"
+      "inputs/ligands/zou/chk_21_rb_intermediate.sdf"
     ],
     "ligand_b_paths": [
-      "inputs/ligands/chk_19.sdf"
+      "inputs/ligands/zou/chk_19.sdf"
     ],
     "protein_paths": [
-      "inputs/proteins/chk1_protein_mod_water_name.pdb"
+      "inputs/proteins/zou/chk1_protein_mod_water_name.pdb"
     ]
   },
   {
@@ -577,13 +577,13 @@
       "55": 52
     },
     "ligand_a_paths": [
-      "inputs/ligands/chk_21.sdf"
+      "inputs/ligands/zou/chk_21.sdf"
     ],
     "ligand_b_paths": [
-      "inputs/ligands/chk_21_rb_intermediate.sdf"
+      "inputs/ligands/zou/chk_21_rb_intermediate.sdf"
     ],
     "protein_paths": [
-      "inputs/proteins/chk1_protein_mod_water_name.pdb"
+      "inputs/proteins/zou/chk1_protein_mod_water_name.pdb"
     ]
   },
   {
@@ -649,13 +649,13 @@
       "25": 30
     },
     "ligand_a_paths": [
-      "inputs/ligands/chk_21_rb_intermediate.sdf"
+      "inputs/ligands/zou/chk_21_rb_intermediate.sdf"
     ],
     "ligand_b_paths": [
-      "inputs/ligands/chk_17.sdf"
+      "inputs/ligands/zou/chk_17.sdf"
     ],
     "protein_paths": [
-      "inputs/proteins/chk1_protein_mod_water_name.pdb"
+      "inputs/proteins/zou/chk1_protein_mod_water_name.pdb"
     ]
   },
   {
@@ -720,13 +720,13 @@
       "49": 30
     },
     "ligand_a_paths": [
-      "inputs/ligands/chk_1.sdf"
+      "inputs/ligands/zou/chk_1.sdf"
     ],
     "ligand_b_paths": [
-      "inputs/ligands/chk_17.sdf"
+      "inputs/ligands/zou/chk_17.sdf"
     ],
     "protein_paths": [
-      "inputs/proteins/chk1_protein_mod_water_name.pdb"
+      "inputs/proteins/zou/chk1_protein_mod_water_name.pdb"
     ]
   },
   {
@@ -796,13 +796,13 @@
       "58": 52
     },
     "ligand_a_paths": [
-      "inputs/ligands/tpsb_2.sdf"
+      "inputs/ligands/zou/tpsb_2.sdf"
     ],
     "ligand_b_paths": [
-      "inputs/ligands/tpsb_1.sdf"
+      "inputs/ligands/zou/tpsb_1.sdf"
     ],
     "protein_paths": [
-      "inputs/proteins/tpsb_protein_mod_water_name.pdb"
+      "inputs/proteins/zou/tpsb_protein_mod_water_name.pdb"
     ]
   },
   {
@@ -862,13 +862,13 @@
       "44": 44
     },
     "ligand_a_paths": [
-      "inputs/ligands/bace_7.sdf"
+      "inputs/ligands/zou/bace_7.sdf"
     ],
     "ligand_b_paths": [
-      "inputs/ligands/bace_7rbi.sdf"
+      "inputs/ligands/zou/bace_7rbi.sdf"
     ],
     "protein_paths": [
-      "inputs/proteins/bace_protein_mod_water_name.pdb"
+      "inputs/proteins/zou/bace_protein_mod_water_name.pdb"
     ]
   },
   {
@@ -923,13 +923,13 @@
       "40": 39
     },
     "ligand_a_paths": [
-      "inputs/ligands/bace_7rbi.sdf"
+      "inputs/ligands/zou/bace_7rbi.sdf"
     ],
     "ligand_b_paths": [
-      "inputs/ligands/bace_6.sdf"
+      "inputs/ligands/zou/bace_6.sdf"
     ],
     "protein_paths": [
-      "inputs/proteins/bace_protein_mod_water_name.pdb"
+      "inputs/proteins/zou/bace_protein_mod_water_name.pdb"
     ]
   },
   {
@@ -983,13 +983,13 @@
       "40": 38
     },
     "ligand_a_paths": [
-      "inputs/ligands/bace_7rbi.sdf"
+      "inputs/ligands/zou/bace_7rbi.sdf"
     ],
     "ligand_b_paths": [
-      "inputs/ligands/bace_31.sdf"
+      "inputs/ligands/zou/bace_31.sdf"
     ],
     "protein_paths": [
-      "inputs/proteins/bace_protein_mod_water_name.pdb"
+      "inputs/proteins/zou/bace_protein_mod_water_name.pdb"
     ]
   },
   {
@@ -1052,13 +1052,13 @@
       "47": 47
     },
     "ligand_a_paths": [
-      "inputs/ligands/ck2_c2.mol"
+      "inputs/ligands/zou/ck2_c2.mol"
     ],
     "ligand_b_paths": [
-      "inputs/ligands/ck2_c2rbi.sdf"
+      "inputs/ligands/zou/ck2_c2rbi.sdf"
     ],
     "protein_paths": [
-      "inputs/proteins/ck2_protein_mod_water_name.pdb"
+      "inputs/proteins/zou/ck2_protein_mod_water_name.pdb"
     ]
   },
   {
@@ -1114,13 +1114,13 @@
       "41": 41
     },
     "ligand_a_paths": [
-      "inputs/ligands/ck2_c2rbi.sdf"
+      "inputs/ligands/zou/ck2_c2rbi.sdf"
     ],
     "ligand_b_paths": [
-      "inputs/ligands/ck2_c1.mol"
+      "inputs/ligands/zou/ck2_c1.mol"
     ],
     "protein_paths": [
-      "inputs/proteins/ck2_protein_mod_water_name.pdb"
+      "inputs/proteins/zou/ck2_protein_mod_water_name.pdb"
     ]
   },
   {
@@ -1174,13 +1174,13 @@
       "31": 29
     },
     "ligand_a_paths": [
-      "inputs/ligands/mth1-7.sdf"
+      "inputs/ligands/zou/mth1-7.sdf"
     ],
     "ligand_b_paths": [
-      "inputs/ligands/mth1-6.sdf"
+      "inputs/ligands/zou/mth1-6.sdf"
     ],
     "protein_paths": [
-      "inputs/proteins/mth1_protein_mod_water_name.pdb"
+      "inputs/proteins/zou/mth1_protein_mod_water_name.pdb"
     ]
   }
 ]
