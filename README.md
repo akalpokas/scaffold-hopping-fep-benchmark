@@ -106,7 +106,7 @@ To execute an RBFE calculation, follow these steps:
 Ensure protein and ligand structures are protonated, properly formatted (e.g., .pdb, .sdf, or .mol2), and placed in an accessible [inputs](inputs/) directory.
 
 ### Step 2: Generate Atom Mappings
-Determine the common core between your ligand pairs.
+Determine the common core between the ligand pairs.
 
 ### Step 3: Construct network.json
 Create the network.json file defining all the edges in your perturbation graph. Here is an example of what a single, fully configured edge looks like:

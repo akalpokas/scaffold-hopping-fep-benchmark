@@ -287,7 +287,7 @@ def setup_alchemical_system(config: "RBFEEdge"):
         )
         print(e)
         xtal_waters = None
-    # Parameterize using the protein FF defined in your schema
+    # Parameterize using the protein FF defined in the schema
     if config.protein_ff.name == "AMBER14SB":
         protein = BSS.Parameters.ff14SB(protein, ensure_compatible=False).getMolecule()
         if xtal_waters is not None:
