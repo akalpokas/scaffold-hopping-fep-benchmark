@@ -5,11 +5,13 @@ from pathlib import Path
 # Import analysis modules
 from analysis_modules.ddG import ddGAnalyzer
 from analysis_modules.energy_traj import EnergyTrajAnalyzer
+from analysis_modules.convergence import ConvergenceAnalyzer
 
 # Registry of available analyses
 AVAILABLE_MODULES = {
     "energy_traj": EnergyTrajAnalyzer(),
     "ddG": ddGAnalyzer(),
+    "convergence": ConvergenceAnalyzer()
 }
 
 def run_analysis(network_path: Path, active_modules: list, protocol: str, k: str, de: str, modifiers: str, specific_edge: str = None):
