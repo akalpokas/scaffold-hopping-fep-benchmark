@@ -1,8 +1,9 @@
 from pathlib import Path
 
+
 class AnalysisModule:
     """Base class for all analysis plugins."""
-    
+
     @property
     def name(self) -> str:
         raise NotImplementedError

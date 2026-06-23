@@ -1,5 +1,11 @@
 # scaffold-hopping-fep-benchmark
 
+![Python Versions](https://img.shields.io/badge/python-3.9%20%7C%203.10%20%7C%203.11%20%7C%203.12-blue)
+[![Built using BioSimSpace](https://img.shields.io/badge/Built%20using-BioSimSpace-blue)](https://github.com/OpenBioSim/biosimspace)
+[![Built using Sire](https://img.shields.io/badge/Built%20using-Sire-blue)](https://github.com/OpenBioSim/sire)
+[![Built using SOMD2](https://img.shields.io/badge/Built%20using-SOMD2-blue)](https://github.com/OpenBioSim/somd2)
+[![Built using Alchemate](https://img.shields.io/badge/Built%20using-Alchemate-blue)](https://github.com/akalpokas/alchemate)
+
 > [!CAUTION]
 > The code in this repository is under active development and is not yet ready for general use.
 
@@ -32,14 +38,18 @@ apptainer run --nv /path/to/alchemate_rb.sif python script.py # or somd2 system.
 > [!Important]
 > If you are using apptainer version of 1.5.1 or are getting the following error during the build process:
 > `While making image from oci registry: error fetching image to cache: while building SIF from layers: while creating squashfs: /usr/libexec/apptainer/bin/mksquashfs command failed:`
-> Run:  
+> Run:
 > `export APPTAINER_IGNORE_PROOT=1`
 > And rerun the pull command above.
 
 ## Setup software
-`biosimspace - 2026.1.0.dev0` (conda install)  
+`biosimspace - 2026.1.0.dev0` (conda install)
 `sire - 2026.1.0.dev0`        (conda install)
-`conda create -n openbiosim-dev -c conda-forge -c openbiosim/label/dev biosimspace gromacs`
+
+```bash
+conda env create -f environment.yml
+conda activate scaffold-hopping-pipeline
+```
 
 ## Run images
 - Default: [2026.06.11](https://hub.docker.com/repository/docker/akalpokas/alchemate_rb/tags/2026.06.11)
@@ -144,11 +154,11 @@ Once the JSON is created, pass it to the pipeline execution scripts.
 > - Edge-wise
 > - Leg-wise
 > - Replicate-wise
-> - Protocol-wise  
+> - Protocol-wise
 >
 > Meaning that if you want to run `edgeA_to_B` from network `X`, but you only want to run the `free leg` replicate `2` using the protocol `Z`, the tools are flexible enough to setup and run these simulations.
 
-`Tools` - Use them to process a network from start to finish.  
+`Tools` - Use them to process a network from start to finish.
 `Templates` - Modify them once to align to specific HPC or simulation processing needs.
 
 | Script    | Type | Purpose |
@@ -219,7 +229,7 @@ flowchart TD
         Schema{{Pydantic Schema}}:::check
         PipeMap[rbfe_pipeline.py stage: map]:::script
         PipeSetup[rbfe_pipeline.py stage: setup]:::script
-        
+
         Schema --> PipeMap
         Schema --> PipeSetup
     end
@@ -260,10 +270,10 @@ flowchart TD
     Deploy -->|Loops edges, legs, reps| Slurm
     Slurm -->|Uses the template slurm script| Bash
     Bash --> Run
-    
+
     Free -.->|Loaded by| Run
     Bound -.->|Loaded by| Run
-    
+
     Run -->|Executes SOMD2| MD
 
     %% Step 4 to 5

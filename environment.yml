@@ -1,0 +1,16 @@
+name: scaffold-hopping-pipeline
+channels:
+  - openbiosim/label/dev
+  - conda-forge
+  - nodefaults
+dependencies:
+  - python >=3.9,<3.13
+
+  # Core packages
+  - biosimspace
+
+  # Pipeline architecture and validation
+  - pydantic
+
+  # Testing suite
+  - pytest

@@ -1,0 +1,28 @@
+[
+  {
+"edge_id": "cyclohexane",
+    "metadata": {
+      "experimental_ddg_kcal_mol": -99,
+      "notes": "Standard decoupling"
+    },
+    "protein_ff": "amber14",
+    "ligand_ff": "gaff2",
+    "output_dir": "prepared_outputs/cycloalkane/ahfe/cyclohexane",
+    "ligand_a_paths": [
+      "inputs/ligands/cycloalkanes/cyclohexane.sdf"
+    ]
+  },
+  {
+"edge_id": "cyclopentane",
+    "metadata": {
+      "experimental_ddg_kcal_mol": -99,
+      "notes": "Standard decoupling"
+    },
+    "protein_ff": "amber14",
+    "ligand_ff": "gaff2",
+    "output_dir": "prepared_outputs/cycloalkane/ahfe/cyclopentane",
+    "ligand_a_paths": [
+      "inputs/ligands/cycloalkanes/cyclopentane.sdf"
+    ]
+  }
+]

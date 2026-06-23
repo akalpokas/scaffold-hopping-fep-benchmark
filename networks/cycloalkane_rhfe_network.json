@@ -1,0 +1,35 @@
+[
+  {
+"edge_id": "cyclopentane_to_cyclohexane",
+    "metadata": {
+      "experimental_ddg_kcal_mol": -99,
+      "notes": "Bond annihilation"
+    },
+    "protein_ff": "amber14",
+    "ligand_ff": "gaff2",
+    "output_dir": "prepared_outputs/cycloalkanes/rhfe/cyclopentane_to_cyclohexane",
+    "mapping": {
+    "0": 0,
+    "5": 6,
+    "6": 7,
+    "1": 1,
+    "7": 8,
+    "8": 9,
+    "2": 2,
+    "9": 10,
+    "10": 11,
+    "3": 3,
+    "11": 12,
+    "12": 13,
+    "4": 4,
+    "13": 14,
+    "14": 15
+    },
+    "ligand_a_paths": [
+      "inputs/ligands/cycloalkanes/cyclopentane.sdf"
+    ],
+    "ligand_b_paths": [
+      "inputs/ligands/cycloalkanes/cyclohexane.sdf"
+    ]
+  }
+]

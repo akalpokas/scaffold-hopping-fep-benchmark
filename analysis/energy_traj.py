@@ -4,13 +4,21 @@ from .base import AnalysisModule
 from rich.console import Console
 from rich.table import Table
 
-class EnergyTrajAnalyzer(AnalysisModule):
 
+class EnergyTrajAnalyzer(AnalysisModule):
     @property
     def name(self) -> str:
         return "energy_traj"
 
-    def analyze_replicate(self, run_dir: Path, out_dir: Path, leg: str, rep: int, T: float = 300.0, **kwargs):
+    def analyze_replicate(
+        self,
+        run_dir: Path,
+        out_dir: Path,
+        leg: str,
+        rep: int,
+        T: float = 300.0,
+        **kwargs,
+    ):
         """
         Reports the energy trajectories from the simulations.
 
@@ -33,10 +41,8 @@ class EnergyTrajAnalyzer(AnalysisModule):
         files = glob(f"{run_dir}/*.parquet")
 
         glob_path = Path(run_dir)
-        
 
         analysed_df_list = []
-
 
         files = sorted(glob_path.glob("**/*.parquet"))
         for f in files:
@@ -48,7 +54,9 @@ class EnergyTrajAnalyzer(AnalysisModule):
         # check if all dataframes contain the same number of entries
         lengths = [len(df) for df in analysed_df_list]
         if len(set(lengths)) != 1:
-            self.console.print(f"Not all dataframes contain the same number of entries: {lengths}")
+            self.console.print(
+                f"Not all dataframes contain the same number of entries: {lengths}"
+            )
 
         self.table.add_row(str(run_dir), str(lengths))
         self.console.print(self.table)
@@ -58,4 +66,3 @@ class EnergyTrajAnalyzer(AnalysisModule):
 
     def compare_edge(self, out_dir: Path):
         pass
-
