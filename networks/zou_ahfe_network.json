@@ -1,0 +1,80 @@
+[
+  {
+"edge_id": "facx_4d",
+    "metadata": {
+      "experimental_ddg_kcal_mol": -99,
+      "notes": "Standard decoupling"
+    },
+    "protein_ff": "amber14",
+    "ligand_ff": "gaff2",
+    "output_dir": "prepared_outputs/zou/ahfe/facx_4d",
+    "ligand_a_paths": [
+      "inputs/ligands/zou/facx_4d.sdf"
+    ]
+  },
+  {
+"edge_id": "facx_edo",
+    "metadata": {
+      "experimental_ddg_kcal_mol": -99,
+      "notes": "Standard decoupling"
+    },
+    "protein_ff": "amber14",
+    "ligand_ff": "gaff2",
+    "output_dir": "prepared_outputs/zou/ahfe/facx_edo",
+    "ligand_a_paths": [
+      "inputs/ligands/zou/facx_edo.sdf"
+    ]
+  },
+  {
+"edge_id": "facx_4d_no_charge",
+    "metadata": {
+      "experimental_ddg_kcal_mol": -99,
+      "notes": "Standard decoupling"
+    },
+    "protein_ff": "amber14",
+    "ligand_ff": "gaff2",
+    "output_dir": "prepared_outputs/zou/ahfe/facx_4d_no_charge",
+    "ligand_a_paths": [
+      "inputs/ligands/zou/facx_4d_no_charge.sdf"
+    ]
+  },
+  {
+"edge_id": "facx_edo_no_charge",
+    "metadata": {
+      "experimental_ddg_kcal_mol": -99,
+      "notes": "Standard decoupling"
+    },
+    "protein_ff": "amber14",
+    "ligand_ff": "gaff2",
+    "output_dir": "prepared_outputs/zou/ahfe/facx_edo_no_charge",
+    "ligand_a_paths": [
+      "inputs/ligands/zou/facx_edo_no_charge.sdf"
+    ]
+  },
+  {
+"edge_id": "bace_7",
+    "metadata": {
+      "experimental_ddg_kcal_mol": -99,
+      "notes": "Standard decoupling"
+    },
+    "protein_ff": "amber14",
+    "ligand_ff": "gaff2",
+    "output_dir": "prepared_outputs/zou/ahfe/bace_7",
+    "ligand_a_paths": [
+      "inputs/ligands/zou/bace_7.sdf"
+    ]
+  },
+  {
+"edge_id": "bace_7rbi",
+    "metadata": {
+      "experimental_ddg_kcal_mol": -99,
+      "notes": "Standard decoupling"
+    },
+    "protein_ff": "amber14",
+    "ligand_ff": "gaff2",
+    "output_dir": "prepared_outputs/zou/ahfe/bace_7rbi",
+    "ligand_a_paths": [
+      "inputs/ligands/zou/bace_7rbi.sdf"
+    ]
+  }
+]
