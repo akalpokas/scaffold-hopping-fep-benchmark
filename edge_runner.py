@@ -26,7 +26,7 @@ def get_user_input():
         "--protocol",
         type=str,
         required=True,
-        choices=["testing", "prod", "prod_2fs", "long"],
+        choices=["testing", "prod", "prod_2fs", "long", "tucker"],
     )
     parser.add_argument(
         "--leg_name",
@@ -245,7 +245,7 @@ def main():
             optimization_runtime="500ps",
             vacuum_optimization=False,
         ),
-        RunBasicCalculation(calculation_runtime=f"{prod_time}ps"),
+        RunBasicCalculation(calculation_runtime=f"{somd2_config.runtime}ps"),
     ]
 
     manager = WorkflowManager(context=context, workflow_steps=simulation_workflow)
