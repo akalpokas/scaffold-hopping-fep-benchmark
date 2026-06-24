@@ -140,41 +140,80 @@ def main():
     # ==========================================
     # MD Protocol Settings
     # ==========================================
-    somd2_config.timestep = "4fs"
+    DEFAULT_PARAMS = {
+        "equilibration_timestep": "2fs",
+        "energy_frequency": "1ps",
+        "cutoff": "10A",
+        "cutoff_type": "PME",
+        "equilibration_constraints": True,
+        "num_energy_neighbours": 5,
+        "h_mass_factor": 3,
+        "rest2_scale": 1,
+        "replica_exchange": True,
+        "log_level": "debug",
+        "save_xml": True,
+        "constraint": "bonds",
+        "timeout": "30s",
+        "shift_delta": "1.5A",
+        "shift_coulomb": "1A",
+    }
 
-    if args.protocol == "testing":
-        equib_time, prod_time, frame_freq, checkpoint_freq = 100, 1000, 250, 500
-        somd2_config.save_crash_report = True
-        somd2_config.save_energy_components = True
-    elif args.protocol == "prod":
-        equib_time, prod_time, frame_freq, checkpoint_freq = 500, 10000, 250, 1000
-    elif args.protocol == "prod_2fs":
-        equib_time, prod_time, frame_freq, checkpoint_freq = 500, 10000, 250, 1000
-        somd2_config.timestep = "2fs"
-    elif args.protocol == "long":
-        equib_time, prod_time, frame_freq, checkpoint_freq = 1000, 25000, 250, 1000
+    PROTOCOLS = {
+        "testing": {
+            "equilibration_time": "100ps",
+            "runtime": "1000ps",
+            "frame_frequency": "250ps",
+            "checkpoint_frequency": "500ps",
+            "save_crash_report": True,
+            "save_energy_components": True,
+        },
+        "prod": {
+            "equilibration_time": "500ps",
+            "runtime": "10000ps",
+            "frame_frequency": "250ps",
+            "checkpoint_frequency": "1000ps",
+        },
+        "prod_2fs": {
+            "equilibration_time": "500ps",
+            "runtime": "10000ps",
+            "frame_frequency": "250ps",
+            "checkpoint_frequency": "1000ps",
+            "timestep": "2fs",
+        },
+        "long": {
+            "equilibration_time": "1000ps",
+            "runtime": "25000ps",
+            "frame_frequency": "250ps",
+            "checkpoint_frequency": "1000ps",
+        },
+        "tucker": {
+            "equilibration_time": "250ps",
+            "runtime": "10000ps",
+            "frame_frequency": "100ps",
+            "checkpoint_frequency": "500ps",
+            "timestep": "2fs",
+            "equilibration_timestep": "1fs",
+            # Override base parameters
+            "energy_frequency": "2ps",
+            "cutoff": "14A",
+            "shift_delta": "2.25A",
+        },
+    }
 
-    somd2_config.equilibration_time = f"{equib_time}ps"
-    somd2_config.runtime = f"{prod_time}ps"
-    somd2_config.frame_frequency = f"{frame_freq}ps"
-    somd2_config.checkpoint_frequency = f"{checkpoint_freq}ps"
+    # 4. Fetch the selected protocol
+    if args.protocol not in PROTOCOLS:
+        raise ValueError(f"Unknown protocol: {args.protocol}")
 
-    # Base parameters
-    somd2_config.equilibration_timestep = "2fs"
-    somd2_config.energy_frequency = "1ps"
-    somd2_config.cutoff = "10A"
-    somd2_config.cutoff_type = "PME"
-    somd2_config.equilibration_constraints = True
-    somd2_config.num_energy_neighbours = 5
-    somd2_config.h_mass_factor = 3
-    somd2_config.rest2_scale = 1
-    somd2_config.replica_exchange = True
-    somd2_config.log_level = "debug"
-    somd2_config.save_xml = True
-    somd2_config.constraint = "bonds"
-    somd2_config.timeout = "30s"
-    somd2_config.shift_delta = "1.5A"
-    somd2_config.shift_coulomb = "1A"
+    selected_protocol = PROTOCOLS[args.protocol]
+
+    # 5. Merge defaults with the protocol overrides
+    # (The double asterisk ** unpacks the dictionaries. If a key exists in both,
+    # the one from `selected_protocol` overwrites the one from `DEFAULT_PARAMS`)
+    final_config = {**DEFAULT_PARAMS, **selected_protocol}
+
+    # 6. Apply all parameters to the somd2_config object
+    for param_name, param_value in final_config.items():
+        setattr(somd2_config, param_name, param_value)
 
     # ==========================================
     # Directory Naming & Ghost Mods
