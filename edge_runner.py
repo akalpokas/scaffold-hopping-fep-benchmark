@@ -26,7 +26,7 @@ def get_user_input():
         "--protocol",
         type=str,
         required=True,
-        choices=["testing", "prod", "prod_2fs", "long", "tucker"],
+        choices=["testing", "prod", "prod_rest2", "prod_2fs", "long", "tucker"],
     )
     parser.add_argument(
         "--leg_name",
@@ -173,6 +173,13 @@ def main():
             "frame_frequency": "250ps",
             "checkpoint_frequency": "1000ps",
         },
+        "prod_rest2": {
+            "equilibration_time": "500ps",
+            "runtime": "10000ps",
+            "frame_frequency": "250ps",
+            "checkpoint_frequency": "1000ps",
+            "rest2_scale": 2,
+        },
         "prod_2fs": {
             "equilibration_time": "500ps",
             "runtime": "10000ps",
@@ -245,7 +252,7 @@ def main():
             optimization_runtime="500ps",
             vacuum_optimization=False,
         ),
-        RunBasicCalculation(calculation_runtime=f"{somd2_config.runtime}ps"),
+        RunBasicCalculation(calculation_runtime=f"{somd2_config.runtime}"),
     ]
 
     manager = WorkflowManager(context=context, workflow_steps=simulation_workflow)
