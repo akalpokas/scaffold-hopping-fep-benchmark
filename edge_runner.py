@@ -1,5 +1,6 @@
 import argparse
 import json
+from pathlib import Path
 
 from somd2.config import Config
 from alchemate.manager import WorkflowManager
@@ -235,6 +236,9 @@ def main():
         out_name = f"{args.leg_name}_{mods_prefix}{args.protocol}_repl_{args.replicate}"
 
     somd2_config.output_directory = str(config.output_dir / out_name)
+
+    # create the output directory if it doesn't exist
+    Path(somd2_config.output_directory).mkdir(parents=True, exist_ok=True)
 
     # ==========================================
     # Execution
