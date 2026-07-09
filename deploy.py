@@ -74,7 +74,7 @@ def submit_jobs(
                     "sbatch",
                     f"--job-name=fep_{edge_id}_{leg}_rep{rep}",
                     f"--output=slurm_logs/{edge_id}_{leg}_rep{rep}.slurm.out",
-                    "slurm_run_apptainer_prod_kaz.sh",
+                    "slurm_run_apptainer_prod.sh",
                     str(network_path),
                     str(edge_id),
                     str(protocol),
