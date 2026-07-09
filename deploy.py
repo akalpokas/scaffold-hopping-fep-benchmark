@@ -3,6 +3,7 @@ import argparse
 import subprocess
 import time
 from pathlib import Path
+from pipeline._utils import validate_protocol
 
 
 def determine_legs(edge_dict: dict, requested_leg: str) -> list[str]:
@@ -73,7 +74,7 @@ def submit_jobs(
                     "sbatch",
                     f"--job-name=fep_{edge_id}_{leg}_rep{rep}",
                     f"--output=slurm_logs/{edge_id}_{leg}_rep{rep}.slurm.out",
-                    "slurm_run_apptainer_prod.sh",
+                    "slurm_run_apptainer_prod_kaz.sh",
                     str(network_path),
                     str(edge_id),
                     str(protocol),
@@ -111,8 +112,8 @@ if __name__ == "__main__":
     parser.add_argument(
         "--protocol",
         required=True,
-        type=str,
-        help="Protocol to run (e.g. 'testing', 'prod')",
+        type=validate_protocol,
+        help="Protocol to run (e.g. 'prod', 'tucker_long', 'prod_rest2_2fs')",
     )
     parser.add_argument(
         "--edge-id",

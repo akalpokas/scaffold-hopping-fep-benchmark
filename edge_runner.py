@@ -1,6 +1,7 @@
 import argparse
 import json
 from pathlib import Path
+from pipeline._utils import validate_protocol
 
 from somd2.config import Config
 from alchemate.manager import WorkflowManager
@@ -25,9 +26,9 @@ def get_user_input():
     )
     parser.add_argument(
         "--protocol",
-        type=str,
+        type=validate_protocol,
         required=True,
-        choices=["testing", "prod", "prod_rest2", "prod_2fs", "long", "tucker"],
+        help="Protocol string consisting of a base and optional modifiers separated by underscores.",
     )
     parser.add_argument(
         "--leg_name",
@@ -119,6 +120,25 @@ def main():
 
     # Apply Morse Potential only if ring breaking is detected
     if bond_alchemy:
+        # Validate that the user-specified transformation matches the detected bond changes
+        # Note that this needs to be done before DMR as it will delete the detectable bond
+        mol = sire_system.molecules("molecule property is_perturbable")
+        ref_mol = sr.morph.link_to_reference(mol)
+        perturbable_mol = ref_mol[0]
+        pert = perturbable_mol.perturbation()
+        pert_omm = pert.to_openmm()
+        changed_bonds_df = pert_omm.changed_bonds(to_pandas=True)
+        n_bonds_created = (changed_bonds_df["k0"] == 0).sum()
+        n_bonds_annihilated = (changed_bonds_df["k1"] == 0).sum()
+
+        if n_bonds_created == 1:
+            assert "bond creation" in metadata_notes
+        elif n_bonds_annihilated == 1:
+            assert "bond annihilation" in metadata_notes
+        else:
+            raise ValueError(
+                "The user specified transformation does not match the detected bond changes."
+            )
         hard_restraints, sire_system = sr.restraints.morse_potential(
             sire_system,
             de="150 kcal mol-1",
@@ -159,7 +179,8 @@ def main():
         "shift_coulomb": "1A",
     }
 
-    PROTOCOLS = {
+    # Define base setups
+    BASE_PROTOCOLS = {
         "testing": {
             "equilibration_time": "100ps",
             "runtime": "1000ps",
@@ -174,26 +195,6 @@ def main():
             "frame_frequency": "250ps",
             "checkpoint_frequency": "1000ps",
         },
-        "prod_rest2": {
-            "equilibration_time": "500ps",
-            "runtime": "10000ps",
-            "frame_frequency": "250ps",
-            "checkpoint_frequency": "1000ps",
-            "rest2_scale": 2,
-        },
-        "prod_2fs": {
-            "equilibration_time": "500ps",
-            "runtime": "10000ps",
-            "frame_frequency": "250ps",
-            "checkpoint_frequency": "1000ps",
-            "timestep": "2fs",
-        },
-        "long": {
-            "equilibration_time": "1000ps",
-            "runtime": "25000ps",
-            "frame_frequency": "250ps",
-            "checkpoint_frequency": "1000ps",
-        },
         "tucker": {
             "equilibration_time": "250ps",
             "runtime": "10000ps",
@@ -201,25 +202,50 @@ def main():
             "checkpoint_frequency": "500ps",
             "timestep": "2fs",
             "equilibration_timestep": "1fs",
-            # Override base parameters
             "energy_frequency": "2ps",
             "cutoff": "14A",
             "shift_delta": "2.25A",
         },
     }
 
-    # 4. Fetch the selected protocol
-    if args.protocol not in PROTOCOLS:
-        raise ValueError(f"Unknown protocol: {args.protocol}")
+    # Define modular overrides
+    MODIFIERS = {
+        "long": {
+            "equilibration_time": "1000ps",
+            "runtime": "25000ps",
+        },
+        "rest2": {
+            "rest2_scale": 2,
+        },
+        "2fs": {
+            "timestep": "2fs",
+        },
+    }
 
-    selected_protocol = PROTOCOLS[args.protocol]
+    # Parse the user's requested protocol (e.g., "tucker_long_rest2")
+    # We assume the first word is the base, and anything after an underscore is a modifier.
+    protocol_parts = args.protocol.split("_")
+    base_name = protocol_parts[0]
+    requested_modifiers = protocol_parts[1:]
 
-    # 5. Merge defaults with the protocol overrides
-    # (The double asterisk ** unpacks the dictionaries. If a key exists in both,
-    # the one from `selected_protocol` overwrites the one from `DEFAULT_PARAMS`)
-    final_config = {**DEFAULT_PARAMS, **selected_protocol}
+    if base_name not in BASE_PROTOCOLS:
+        raise ValueError(
+            f"Unknown base protocol: '{base_name}'. Available bases: {list(BASE_PROTOCOLS.keys())}"
+        )
 
-    # 6. Apply all parameters to the somd2_config object
+    # Build the final configuration sequentially
+    # Start with defaults, overwrite with base protocol, then overwrite with modifiers
+    final_config = DEFAULT_PARAMS.copy()
+    final_config.update(BASE_PROTOCOLS[base_name])
+
+    for mod in requested_modifiers:
+        if mod not in MODIFIERS:
+            raise ValueError(
+                f"Unknown modifier: '{mod}'. Available modifiers: {list(MODIFIERS.keys())}"
+            )
+        final_config.update(MODIFIERS[mod])
+
+    # Apply all parameters to the somd2_config object
     for param_name, param_value in final_config.items():
         setattr(somd2_config, param_name, param_value)
 
