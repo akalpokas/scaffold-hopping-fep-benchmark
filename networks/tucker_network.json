@@ -415,7 +415,7 @@
     "edge_id": "c7_rbi_to_c7_rbi_reconnected",
     "metadata": {
       "experimental_ddg_kcal_mol": -99,
-      "notes": "Bond annihilation"
+      "notes": "Bond creation"
     },
     "protein_ff": "pre_parametrized",
     "ligand_ff": "pre_parametrized",
