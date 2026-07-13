@@ -7,7 +7,7 @@
     },
     "protein_ff": "amber14",
     "ligand_ff": "gaff2",
-    "output_dir": "prepared_outputs/cycloalkane/ahfe/cyclohexane",
+    "output_dir": "prepared_outputs/cycloalkanes/ahfe/cyclohexane",
     "ligand_a_paths": [
       "inputs/ligands/cycloalkanes/cyclohexane.sdf"
     ]
@@ -20,7 +20,7 @@
     },
     "protein_ff": "amber14",
     "ligand_ff": "gaff2",
-    "output_dir": "prepared_outputs/cycloalkane/ahfe/cyclopentane",
+    "output_dir": "prepared_outputs/cycloalkanes/ahfe/cyclopentane",
     "ligand_a_paths": [
       "inputs/ligands/cycloalkanes/cyclopentane.sdf"
     ]
@@ -33,7 +33,7 @@
     },
     "protein_ff": "amber14",
     "ligand_ff": "gaff2",
-    "output_dir": "prepared_outputs/cycloalkane/ahfe/cyclobutane",
+    "output_dir": "prepared_outputs/cycloalkanes/ahfe/cyclobutane",
     "ligand_a_paths": [
       "inputs/ligands/cycloalkanes/cyclobutane.sdf"
     ]
@@ -46,7 +46,7 @@
     },
     "protein_ff": "amber14",
     "ligand_ff": "gaff2",
-    "output_dir": "prepared_outputs/cycloalkane/ahfe/cyclopropane",
+    "output_dir": "prepared_outputs/cycloalkanes/ahfe/cyclopropane",
     "ligand_a_paths": [
       "inputs/ligands/cycloalkanes/cyclopropane.sdf"
     ]
@@ -59,7 +59,7 @@
     },
     "protein_ff": "amber14",
     "ligand_ff": "gaff2",
-    "output_dir": "prepared_outputs/cycloalkane/ahfe/hexane",
+    "output_dir": "prepared_outputs/cycloalkanes/ahfe/hexane",
     "ligand_a_paths": [
       "inputs/ligands/cycloalkanes/hexane.sdf"
     ]
@@ -72,7 +72,7 @@
     },
     "protein_ff": "amber14",
     "ligand_ff": "gaff2",
-    "output_dir": "prepared_outputs/cycloalkane/ahfe/pentane",
+    "output_dir": "prepared_outputs/cycloalkanes/ahfe/pentane",
     "ligand_a_paths": [
       "inputs/ligands/cycloalkanes/pentane.sdf"
     ]
@@ -85,7 +85,7 @@
     },
     "protein_ff": "amber14",
     "ligand_ff": "gaff2",
-    "output_dir": "prepared_outputs/cycloalkane/ahfe/butane",
+    "output_dir": "prepared_outputs/cycloalkanes/ahfe/butane",
     "ligand_a_paths": [
       "inputs/ligands/cycloalkanes/butane.sdf"
     ]
@@ -98,7 +98,7 @@
     },
     "protein_ff": "amber14",
     "ligand_ff": "gaff2",
-    "output_dir": "prepared_outputs/cycloalkane/ahfe/propane",
+    "output_dir": "prepared_outputs/cycloalkanes/ahfe/propane",
     "ligand_a_paths": [
       "inputs/ligands/cycloalkanes/propane.sdf"
     ]
