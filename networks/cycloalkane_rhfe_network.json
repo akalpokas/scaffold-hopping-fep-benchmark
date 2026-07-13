@@ -31,5 +31,131 @@
     "ligand_b_paths": [
       "inputs/ligands/cycloalkanes/cyclohexane.sdf"
     ]
+  },
+  {
+"edge_id": "cyclohexane_to_hexane",
+    "metadata": {
+      "experimental_ddg_kcal_mol": -99,
+      "notes": "Bond annihilation"
+    },
+    "protein_ff": "amber14",
+    "ligand_ff": "gaff2",
+    "output_dir": "prepared_outputs/cycloalkanes/rhfe/cyclohexane_to_hexane",
+    "mapping": {
+    "0": 0,
+    "1": 1,
+    "2": 2,
+    "3": 3,
+    "4": 4,
+    "5": 5,
+    "6": 6,
+    "7": 7,
+    "8": 9,
+    "9": 10,
+    "10": 11,
+    "11": 12,
+    "12": 13,
+    "13": 14,
+    "14": 15,
+    "15": 16,
+    "16": 17,
+    "17": 18
+},
+    "ligand_a_paths": [
+      "inputs/ligands/cycloalkanes/cyclohexane.sdf"
+    ],
+    "ligand_b_paths": [
+      "inputs/ligands/cycloalkanes/hexane.sdf"
+    ]
+  },
+  {
+"edge_id": "cyclopentane_to_pentane",
+    "metadata": {
+      "experimental_ddg_kcal_mol": -99,
+      "notes": "Bond annihilation"
+    },
+    "protein_ff": "amber14",
+    "ligand_ff": "gaff2",
+    "output_dir": "prepared_outputs/cycloalkanes/rhfe/cyclopentane_to_pentane",
+    "mapping": {
+    "0": 0,
+    "1": 1,
+    "2": 2,
+    "3": 3,
+    "4": 4,
+    "5": 5,
+    "6": 7,
+    "7": 8,
+    "8": 9,
+    "9": 10,
+    "10": 11,
+    "11": 12,
+    "12": 13,
+    "13": 14,
+    "14": 15
+},
+    "ligand_a_paths": [
+      "inputs/ligands/cycloalkanes/cyclopentane.sdf"
+    ],
+    "ligand_b_paths": [
+      "inputs/ligands/cycloalkanes/pentane.sdf"
+    ]
+  },
+  {
+"edge_id": "cyclobutane_to_butane",
+    "metadata": {
+      "experimental_ddg_kcal_mol": -99,
+      "notes": "Bond annihilation"
+    },
+    "protein_ff": "amber14",
+    "ligand_ff": "gaff2",
+    "output_dir": "prepared_outputs/cycloalkanes/rhfe/cyclobutane_to_butane",
+    "mapping": {
+    "0": 0,
+    "1": 1,
+    "2": 2,
+    "3": 3,
+    "4": 4,
+    "5": 5,
+    "6": 7,
+    "7": 8,
+    "8": 9,
+    "9": 10,
+    "10": 11,
+    "11": 12
+},
+    "ligand_a_paths": [
+      "inputs/ligands/cycloalkanes/cyclobutane.sdf"
+    ],
+    "ligand_b_paths": [
+      "inputs/ligands/cycloalkanes/butane.sdf"
+    ]
+  },
+  {
+"edge_id": "cyclopropane_to_propane",
+    "metadata": {
+      "experimental_ddg_kcal_mol": -99,
+      "notes": "Bond annihilation"
+    },
+    "protein_ff": "amber14",
+    "ligand_ff": "gaff2",
+    "output_dir": "prepared_outputs/cycloalkanes/rhfe/cyclopropane_to_propane",
+    "mapping": {
+    "0": 0,
+    "1": 1,
+    "2": 2,
+    "3": 3,
+    "4": 4,
+    "5": 6,
+    "6": 7,
+    "7": 8,
+    "8": 9
+},
+    "ligand_a_paths": [
+      "inputs/ligands/cycloalkanes/cyclopropane.sdf"
+    ],
+    "ligand_b_paths": [
+      "inputs/ligands/cycloalkanes/propane.sdf"
+    ]
   }
 ]

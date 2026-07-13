@@ -24,5 +24,83 @@
     "ligand_a_paths": [
       "inputs/ligands/cycloalkanes/cyclopentane.sdf"
     ]
+  },
+  {
+  "edge_id": "cyclobutane",
+    "metadata": {
+      "experimental_ddg_kcal_mol": -99,
+      "notes": "Standard decoupling"
+    },
+    "protein_ff": "amber14",
+    "ligand_ff": "gaff2",
+    "output_dir": "prepared_outputs/cycloalkane/ahfe/cyclobutane",
+    "ligand_a_paths": [
+      "inputs/ligands/cycloalkanes/cyclobutane.sdf"
+    ]
+  },
+  {
+  "edge_id": "cyclopropane",
+    "metadata": {
+      "experimental_ddg_kcal_mol": -99,
+      "notes": "Standard decoupling"
+    },
+    "protein_ff": "amber14",
+    "ligand_ff": "gaff2",
+    "output_dir": "prepared_outputs/cycloalkane/ahfe/cyclopropane",
+    "ligand_a_paths": [
+      "inputs/ligands/cycloalkanes/cyclopropane.sdf"
+    ]
+  },
+  {
+  "edge_id": "hexane",
+    "metadata": {
+      "experimental_ddg_kcal_mol": -99,
+      "notes": "Standard decoupling"
+    },
+    "protein_ff": "amber14",
+    "ligand_ff": "gaff2",
+    "output_dir": "prepared_outputs/cycloalkane/ahfe/hexane",
+    "ligand_a_paths": [
+      "inputs/ligands/cycloalkanes/hexane.sdf"
+    ]
+  },
+  {
+  "edge_id": "pentane",
+    "metadata": {
+      "experimental_ddg_kcal_mol": -99,
+      "notes": "Standard decoupling"
+    },
+    "protein_ff": "amber14",
+    "ligand_ff": "gaff2",
+    "output_dir": "prepared_outputs/cycloalkane/ahfe/pentane",
+    "ligand_a_paths": [
+      "inputs/ligands/cycloalkanes/pentane.sdf"
+    ]
+  },
+  {
+  "edge_id": "butane",
+    "metadata": {
+      "experimental_ddg_kcal_mol": -99,
+      "notes": "Standard decoupling"
+    },
+    "protein_ff": "amber14",
+    "ligand_ff": "gaff2",
+    "output_dir": "prepared_outputs/cycloalkane/ahfe/butane",
+    "ligand_a_paths": [
+      "inputs/ligands/cycloalkanes/butane.sdf"
+    ]
+  },
+  {
+  "edge_id": "propane",
+    "metadata": {
+      "experimental_ddg_kcal_mol": -99,
+      "notes": "Standard decoupling"
+    },
+    "protein_ff": "amber14",
+    "ligand_ff": "gaff2",
+    "output_dir": "prepared_outputs/cycloalkane/ahfe/propane",
+    "ligand_a_paths": [
+      "inputs/ligands/cycloalkanes/propane.sdf"
+    ]
   }
 ]
