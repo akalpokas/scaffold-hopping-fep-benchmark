@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
 from pathlib import Path
+import matplotlib.pyplot as plt
+import seaborn as sns
 from .base import AnalysisModule
 from rich.console import Console
 from rich.table import Table
@@ -43,7 +45,7 @@ class ddGAnalyzer(AnalysisModule):
         **kwargs,
     ):
         """
-        Parses and records the dG value from a single replicate simulation.
+        Parses and records the dG value and PMF from a single replicate simulation.
         """
         # Dynamically initialize dictionary structures
         if edge_id not in self.data:
@@ -61,21 +63,27 @@ class ddGAnalyzer(AnalysisModule):
                 f"Error analyzing edge '{edge_id}', replicate {rep} in leg '{leg}': {e}"
             )
             dg = np.nan
+            pmf = None
 
-        # Store the single replicate value
-        self.data[edge_id][leg][rep] = dg
+        # Store the single replicate value and PMF as a dictionary
+        self.data[edge_id][leg][rep] = {"dg": dg, "pmf": pmf}
 
     def aggregate_leg(self, edge_id: str, out_dir: Path, leg: str):
         """
-        Calculates the mean and standard deviation for all parsed replicates of a given leg.
+        Calculates the mean and standard deviation for all parsed replicates of a given leg,
+        and plots the PMF values for all replicates.
         """
         if edge_id not in self.data or leg not in self.data[edge_id]:
             return
 
         # Filter out NaN values from failed runs before calculating stats
-        rep_values = [
-            val for val in self.data[edge_id][leg].values() if not np.isnan(val)
-        ]
+        valid_reps = {
+            rep: data
+            for rep, data in self.data[edge_id][leg].items()
+            if not np.isnan(data["dg"])
+        }
+
+        rep_values = [data["dg"] for data in valid_reps.values()]
 
         if rep_values:
             mean_dg = np.mean(rep_values)
@@ -87,6 +95,27 @@ class ddGAnalyzer(AnalysisModule):
         # Store aggregated metrics
         self.data[edge_id][f"{leg}_mean"] = mean_dg
         self.data[edge_id][f"{leg}_std"] = std_dg
+
+        # Plot PMFs if valid replicates exist
+        if valid_reps:
+            fig, ax = plt.subplots(figsize=(10, 6))
+
+            for rep, data in valid_reps.items():
+                pmf = data["pmf"]
+                if pmf is not None:
+                    lam_vals = [pmf[i][0] for i in range(len(pmf))]
+                    pmf_vals = [pmf[i][1].value() for i in range(len(pmf))]
+
+                    sns.lineplot(x=lam_vals, y=pmf_vals, ax=ax, label=f"Replica {rep}")
+
+            ax.set_xlabel("Lambda")
+            ax.set_ylabel("Free Energy (kcal/mol)")
+            ax.set_title(f"PMF Profile: {edge_id} ({leg.capitalize()})")
+
+            # Save the plot
+            plot_path = out_dir / f"{edge_id}_{leg}_pmf.png"
+            fig.savefig(plot_path, dpi=300, bbox_inches="tight")
+            plt.close(fig)
 
     def compare_edge(self, edge_id: str, out_dir: Path):
         """
@@ -160,7 +189,8 @@ class ddGAnalyzer(AnalysisModule):
             leg_mean = edge_info.get(f"{leg}_mean", np.nan)
             leg_std = edge_info.get(f"{leg}_std", np.nan)
 
-            for rep, val in sorted(edge_info.get(leg, {}).items()):
+            for rep, data in sorted(edge_info.get(leg, {}).items()):
+                val = data["dg"]
                 leg_label = f"[bold]{leg.capitalize()}[/bold]" if first else ""
                 first = False
                 val_str = f"{val:.2f}" if not np.isnan(val) else "NaN"
