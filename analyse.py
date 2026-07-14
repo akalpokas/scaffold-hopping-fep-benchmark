@@ -56,9 +56,11 @@ def get_run_folder_name(
     mods_prefix = "ghost_mods_" if ghost_mods else ""
 
     if bond_alchemy:
-        return f"{leg}_k_{k}_{mods_prefix}de_{de}_{protocol}_repl_{rep}"
+        return (
+            f"{leg}_k_{k}_{mods_prefix}de_{de}_{protocol}_2026_07_03_devel_repl_{rep}"
+        )
     else:
-        return f"{leg}_{mods_prefix}{protocol}_repl_{rep}"
+        return f"{leg}_{mods_prefix}{protocol}_2026_07_03_devel_repl_{rep}"
 
 
 def run_analysis(
@@ -86,47 +88,55 @@ def run_analysis(
     replicates_to_run = [replicate] if replicate is not None else [1, 2, 3]
 
     for edge_dict in edges_data:
-        config = parse_config(edge_dict)
-        edge_id = config.id
+        try:
+            config = parse_config(edge_dict)
+            edge_id = config.id
 
-        # Centralized analysis output folder
-        out_dir = config.output_dir / "analysis"
-        out_dir.mkdir(parents=True, exist_ok=True)
+            # Centralized analysis output folder
+            out_dir = config.output_dir / "analysis"
+            out_dir.mkdir(parents=True, exist_ok=True)
 
-        print(f"=== Analyzing: {edge_id} ===")
+            print(f"=== Analyzing: {edge_id} ===")
 
-        legs_to_run = determine_legs(config, requested_leg)
-        if not legs_to_run:
+            legs_to_run = determine_legs(config, requested_leg)
+            if not legs_to_run:
+                print(
+                    f"    [!] Skipping: Requested leg '{requested_leg}' invalid for this system."
+                )
+                continue
+
+            # 1 & 2: Replicate and Leg Level
+            for leg in legs_to_run:
+                for rep in replicates_to_run:
+                    # Dynamically predict the folder name
+                    run_folder = get_run_folder_name(
+                        config, leg, protocol, rep, k, de, ghost_mods
+                    )
+                    run_dir = config.output_dir / run_folder
+
+                    if run_dir.exists():
+                        # Pass the directory to every active module
+                        for module in active_modules:
+                            module.analyze_replicate(
+                                edge_id, run_dir, out_dir, leg, rep
+                            )
+                    else:
+                        print(f"    [!] Missing run directory: {run_folder}")
+
+                # After all replicates for this leg are done, trigger aggregation
+                for module in active_modules:
+                    module.aggregate_leg(edge_id, out_dir, leg)
+
+            # 3: Edge/Node Level (Cross-leg comparison)
+            for module in active_modules:
+                module.compare_edge(edge_id, out_dir)
+
+            print("")  # Formatting newline
+        except Exception as e:
             print(
-                f"    [!] Skipping: Requested leg '{requested_leg}' invalid for this system."
+                f"    [!] Error processing {edge_dict.get('edge_id', 'Unknown ID')}: {e}"
             )
             continue
-
-        # 1 & 2: Replicate and Leg Level
-        for leg in legs_to_run:
-            for rep in replicates_to_run:
-                # Dynamically predict the folder name
-                run_folder = get_run_folder_name(
-                    config, leg, protocol, rep, k, de, ghost_mods
-                )
-                run_dir = config.output_dir / run_folder
-
-                if run_dir.exists():
-                    # Pass the directory to every active module
-                    for module in active_modules:
-                        module.analyze_replicate(edge_id, run_dir, out_dir, leg, rep)
-                else:
-                    print(f"    [!] Missing run directory: {run_folder}")
-
-            # After all replicates for this leg are done, trigger aggregation
-            for module in active_modules:
-                module.aggregate_leg(edge_id, out_dir, leg)
-
-        # 3: Edge/Node Level (Cross-leg comparison)
-        for module in active_modules:
-            module.compare_edge(edge_id, out_dir)
-
-        print("")  # Formatting newline
 
 
 if __name__ == "__main__":
