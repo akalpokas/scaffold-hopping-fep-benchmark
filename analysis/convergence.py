@@ -5,40 +5,37 @@ import numpy as np
 from pathlib import Path
 import glob
 import logging
+import shutil
 
 logger = logging.getLogger(__name__)
 
 # HELPER FUNCTIONS
 
 
-def _analyse_somd2(work_dir, T=300.0, use_checkpoint_files=False, **kwargs):
+def _analyse_somd2(work_dir, T=300.0, **kwargs):
     """
     Analyzes the results of SOMD2 simulations.
     """
     import pathlib as _pathlib
+
+    # Check whether "OptimizeLambdaProbabilities" folder exists and if it does remove it
+    opt_dir = Path(work_dir) / "OptimizeLambdaProbabilities"
+    if opt_dir.is_dir():
+        shutil.rmtree(opt_dir)
+        logger.info(f"Removed 'OptimizeLambdaProbabilities' folder from {work_dir}.")
 
     files = glob.glob(f"{work_dir}/energy_traj_*.parquet")
     glob_path = _pathlib.Path(work_dir)
 
     analysed_df_list = []
 
-    if use_checkpoint_files:
-        files = sorted(glob_path.glob("**/*.s3"))
-        logger.debug(f"Found {len(files)} checkpoint files in {work_dir}")
-        for f in files:
-            logger.debug(f"Loading checkpoint file: {f}")
-            import sire as sr
+    files = sorted(glob_path.glob("**/energy_traj_*.parquet"))
+    for f in files:
+        path = Path(f)
+        import BioSimSpace as BSS
 
-            system = sr.stream.load(str(f))
-            analysed_df_list.append(system.energy_trajectory().to_alchemlyb())
-    else:
-        files = sorted(glob_path.glob("**/energy_traj_*.parquet"))
-        for f in files:
-            path = Path(f)
-            import BioSimSpace as BSS
-
-            analysed_df = BSS.FreeEnergy.Relative._somd2_extract(path, T=T, **kwargs)
-            analysed_df_list.append(analysed_df)
+        analysed_df = BSS.FreeEnergy.Relative._somd2_extract(path, T=T, **kwargs)
+        analysed_df_list.append(analysed_df)
 
     # check if all dataframes contain the same number of entries
     lengths = [len(df) for df in analysed_df_list]
