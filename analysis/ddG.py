@@ -1,12 +1,21 @@
 import numpy as np
 import pandas as pd
 from pathlib import Path
-import matplotlib.pyplot as plt
-import seaborn as sns
 from .base import AnalysisModule
 from rich.console import Console
 from rich.table import Table
 from BioSimSpace.FreeEnergy import Relative
+
+# Attempt to import plotting libraries
+try:
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+
+    PLOTTING_ENABLED = True
+except ImportError:
+    plt = None
+    sns = None
+    PLOTTING_ENABLED = False
 
 
 class ddGAnalyzer(AnalysisModule):
@@ -14,6 +23,13 @@ class ddGAnalyzer(AnalysisModule):
         super().__init__()
         self.console = Console()
         self.data = {}
+
+        # Notify the user once upon initialization if plotting is disabled
+        if not PLOTTING_ENABLED:
+            self.console.print(
+                "[yellow]Warning: matplotlib or seaborn not found. "
+                "PMF plotting functionality will be disabled.[/yellow]"
+            )
 
     @property
     def name(self) -> str:
@@ -71,7 +87,7 @@ class ddGAnalyzer(AnalysisModule):
     def aggregate_leg(self, edge_id: str, out_dir: Path, leg: str):
         """
         Calculates the mean and standard deviation for all parsed replicates of a given leg,
-        and plots the PMF values for all replicates.
+        and plots the PMF values for all replicates if plotting is enabled.
         """
         if edge_id not in self.data or leg not in self.data[edge_id]:
             return
@@ -96,8 +112,8 @@ class ddGAnalyzer(AnalysisModule):
         self.data[edge_id][f"{leg}_mean"] = mean_dg
         self.data[edge_id][f"{leg}_std"] = std_dg
 
-        # Plot PMFs if valid replicates exist
-        if valid_reps:
+        # Plot PMFs if valid replicates exist AND plotting libraries are installed
+        if valid_reps and PLOTTING_ENABLED:
             fig, ax = plt.subplots(figsize=(10, 6))
 
             for rep, data in valid_reps.items():
