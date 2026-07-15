@@ -297,6 +297,10 @@ class ConvergenceAnalyzer:
         )
         print(summary_df.to_string(index=False))
 
+        # save the aggregated convergence data
+        aggregated_csv_path = out_dir / f"{edge_id}_{leg}_aggregated_convergence.csv"
+        combined_dfs.to_csv(aggregated_csv_path, index=False)
+
         # PLOTTING
         sns.set_theme(style="ticks", context="paper", font_scale=1.3)
 
