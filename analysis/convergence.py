@@ -7,6 +7,8 @@ import glob
 import logging
 import shutil
 
+from alchemlyb.preprocessing import decorrelate_u_nk
+
 logger = logging.getLogger(__name__)
 
 # HELPER FUNCTIONS
@@ -24,7 +26,6 @@ def _analyse_somd2(work_dir, T=300.0, **kwargs):
         shutil.rmtree(opt_dir)
         logger.info(f"Removed 'OptimizeLambdaProbabilities' folder from {work_dir}.")
 
-    files = glob.glob(f"{work_dir}/energy_traj_*.parquet")
     glob_path = _pathlib.Path(work_dir)
 
     analysed_df_list = []
@@ -82,11 +83,11 @@ class ConvergenceAnalyzer:
         self._name = "convergence"
         self.override_mismatch = override_mismatch
 
-        # 1. DEFINE STRATEGIES
+        # 1. DEFINE STRATEGIES (Added the 'auto_eq' flag)
         self.base_strategies = base_strategies or {
-            "Full": {"t_min": 0, "t_max": None},
-            "Manual Discard": {"t_min": 4999, "t_max": None},
-            "Rapid": {"t_min": 1001, "t_max": 5001},
+            "Full": {"t_min": 0, "t_max": None, "auto_eq": False},
+            "Auto-Equilibrated": {"t_min": 0, "t_max": None, "auto_eq": True},
+            "Rapid": {"t_min": 1001, "t_max": 5001, "auto_eq": False},
         }
 
         # Dictionary to track expected sampling times across replicates
@@ -113,8 +114,8 @@ class ConvergenceAnalyzer:
             f"    Analysed dataframes for Replicate {rep}: {[df.shape for df in analysed_df_list]}"
         )
 
-        # detect global maximum time
-        global_max_ps = int(analysed_df_list[0][0].index.get_level_values("time").max())
+        # detect global maximum time (Fixed indexing to match list of DataFrames)
+        global_max_ps = int(analysed_df_list[0].index.get_level_values("time").max())
 
         # Validation Check against Replicate 1 (or whichever runs first)
         leg_key = f"{edge_id}_{leg}"
@@ -131,36 +132,79 @@ class ConvergenceAnalyzer:
             )
 
         global_max_ns = round(global_max_ps / 1000)
+
         convergence_dfs = []
+        discard_metrics = []  # Track discard statistics
 
         for base_name, bounds in self.base_strategies.items():
-            trimmed_analysed_df_list = []
+            processed_df_list = []
 
-            # Apply the time mask for this strategy
-            for df in analysed_df_list:
+            # Apply the time mask and auto-equilibration for this strategy
+            for window_idx, df in enumerate(analysed_df_list):
                 time_vals = df.index.get_level_values("time")
                 mask = time_vals >= bounds["t_min"]
                 if bounds["t_max"] is not None:
                     mask = mask & (time_vals <= bounds["t_max"])
-                trimmed_analysed_df_list.append(df[mask])
+                masked_df = df[mask]
 
-            # Calculate accurate times for the trimmed block
-            start_time = int(
-                trimmed_analysed_df_list[0][0].index.get_level_values("time").min()
-            )
-            start_ns = start_time / 1000
+                if bounds.get("auto_eq", False):
+                    try:
+                        final_df = decorrelate_u_nk(masked_df, remove_burnin=True)
 
-            # Create title label
-            end_ns_label = (
-                round(bounds["t_max"] / 1000)
-                if bounds["t_max"] is not None
-                else global_max_ns
-            )
-            strategy_name = f"{base_name} ({round(start_ns)} - {end_ns_label} ns)"
+                        # Calculate and record discard metrics
+                        orig_start_ps = masked_df.index.get_level_values("time").min()
+                        orig_end_ps = masked_df.index.get_level_values("time").max()
+                        new_start_ps = final_df.index.get_level_values("time").min()
+
+                        total_time_ps = orig_end_ps - orig_start_ps
+                        discarded_time_ps = new_start_ps - orig_start_ps
+
+                        discard_metrics.append(
+                            {
+                                "Replicate": rep,
+                                "Strategy": base_name,
+                                "Lambda_Window": window_idx,
+                                "Original_Start_ns": round(orig_start_ps / 1000, 3),
+                                "Equilibrated_Start_ns": round(new_start_ps / 1000, 3),
+                                "Discarded_ns": round(discarded_time_ps / 1000, 3),
+                                "Total_Original_ns": round(total_time_ps / 1000, 3),
+                                "Fraction_Discarded": round(
+                                    discarded_time_ps / total_time_ps
+                                    if total_time_ps > 0
+                                    else 0,
+                                    3,
+                                ),
+                            }
+                        )
+
+                    except Exception as e:
+                        print(
+                            f"    [!] Warning: Auto-equilibration failed for Window {window_idx} (fallback to raw). Error: {e}"
+                        )
+                        final_df = masked_df
+                else:
+                    final_df = masked_df
+
+                processed_df_list.append(final_df)
+
+            # Create title label dynamically
+            if bounds.get("auto_eq", False):
+                strategy_name = f"{base_name}\n(Variable Discard)"
+            else:
+                start_time = int(
+                    processed_df_list[0].index.get_level_values("time").min()
+                )
+                start_ns = start_time / 1000
+                end_ns_label = (
+                    round(bounds["t_max"] / 1000)
+                    if bounds["t_max"] is not None
+                    else global_max_ns
+                )
+                strategy_name = f"{base_name}\n({round(start_ns)} - {end_ns_label} ns)"
 
             # Run alchemlyb calculation using the helper function
             convergence_df = _plot_alchemlyb_convergence(
-                trimmed_analysed_df_list, number_of_points=10
+                processed_df_list, number_of_points=10
             )
 
             # Normalize data_fraction column
@@ -168,25 +212,60 @@ class ConvergenceAnalyzer:
                 convergence_df["data_fraction"] / convergence_df["data_fraction"].max()
             )
 
-            plt.close(
-                "all"
-            )  # Silently close the unwanted figure(s) generated by alchemlyb
+            plt.close("all")  # Silently close the unwanted figure(s)
 
             convergence_df["replicate"] = rep
             convergence_df["strategy"] = strategy_name
 
             convergence_dfs.append(convergence_df)
 
-        # Cache this replicate's data so aggregate_leg can pick it up
+        # Cache this replicate's convergence data
         combined_df = pd.concat(convergence_dfs, ignore_index=True)
         csv_path = out_dir / f"{edge_id}_{leg}_rep_{rep}_convergence.csv"
         combined_df.to_csv(csv_path, index=False)
+
+        # Cache this replicate's discard metrics if they exist
+        if discard_metrics:
+            metrics_df = pd.DataFrame(discard_metrics)
+            metrics_csv_path = (
+                out_dir / f"{edge_id}_{leg}_rep_{rep}_discard_metrics.csv"
+            )
+            metrics_df.to_csv(metrics_csv_path, index=False, float_format="%.3f")
 
     def aggregate_leg(self, edge_id: str, out_dir: Path, leg: str):
         """2. Aggregates the replicates for a single leg and plots the results."""
         print(f"[{self.name}] Aggregating {edge_id} | {leg}...")
 
-        # Read the cached CSVs for this leg
+        # ---------------------------------------------------------
+        # AGGREGATE DISCARD METRICS
+        # ---------------------------------------------------------
+        metrics_files = list(out_dir.glob(f"{edge_id}_{leg}_rep_*_discard_metrics.csv"))
+        if metrics_files:
+            combined_metrics = pd.concat(
+                [pd.read_csv(f) for f in metrics_files], ignore_index=True
+            )
+            master_metrics_path = (
+                out_dir / f"{edge_id}_{leg}_aggregated_discard_metrics.csv"
+            )
+            combined_metrics.to_csv(
+                master_metrics_path, index=False, float_format="%.3f"
+            )
+            print(
+                f"    Saved aggregated discard metrics to: {master_metrics_path.name}"
+            )
+
+            # Print quick summary
+            print("\n    Average Discard per Replicate (Auto-Equilibrated):")
+            avg_discard = (
+                combined_metrics.groupby("Replicate")["Discarded_ns"]
+                .mean()
+                .reset_index()
+            )
+            print(avg_discard.to_string(index=False))
+
+        # ---------------------------------------------------------
+        # AGGREGATE CONVERGENCE & PLOT
+        # ---------------------------------------------------------
         csv_files = list(out_dir.glob(f"{edge_id}_{leg}_rep_*_convergence.csv"))
         if not csv_files:
             print(
@@ -196,7 +275,7 @@ class ConvergenceAnalyzer:
 
         combined_dfs = pd.concat([pd.read_csv(f) for f in csv_files], ignore_index=True)
 
-        # 3. SUMMARY STATISTICS
+        # SUMMARY STATISTICS
         final_rows = (
             combined_dfs.sort_values("data_fraction")
             .groupby(["strategy", "replicate"])
@@ -214,11 +293,11 @@ class ConvergenceAnalyzer:
         )
 
         print(
-            f"\nFinal Free Energy Estimates Summary ({edge_id} - {leg.capitalize()}):"
+            f"\n    Final Free Energy Estimates Summary ({edge_id} - {leg.capitalize()}):"
         )
         print(summary_df.to_string(index=False))
 
-        # 4. PLOTTING
+        # PLOTTING
         sns.set_theme(style="ticks", context="paper", font_scale=1.3)
 
         strategy_labels = combined_dfs["strategy"].unique()
