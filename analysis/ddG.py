@@ -124,6 +124,11 @@ class ddGAnalyzer(AnalysisModule):
 
                     sns.lineplot(x=lam_vals, y=pmf_vals, ax=ax, label=f"Replica {rep}")
 
+                    # Save this replicate's PMF data
+                    pmf_df = pd.DataFrame({"lambda": lam_vals, "pmf": pmf_vals})
+                    csv_path = out_dir / f"{edge_id}_{leg}_rep_{rep}_pmf.csv"
+                    pmf_df.to_csv(csv_path, index=False)
+
             ax.set_xlabel("Lambda")
             ax.set_ylabel("Free Energy (kcal/mol)")
             ax.set_title(f"PMF Profile: {edge_id} ({leg.capitalize()})")
