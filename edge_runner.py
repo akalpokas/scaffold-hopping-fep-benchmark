@@ -239,7 +239,7 @@ def main():
         "rest2": {
             "rest2_scale": 2,
         },
-        "target_angle_rest2": {
+        "targetAngleRest2": {
             "rest2_scale": 2,
         },
         "2fs": {
@@ -248,7 +248,7 @@ def main():
     }
 
     # For rest2, add rest2 angle atoms if they exist
-    if "target_angle_rest2" in requested_modifiers:
+    if "targetAngleRest2" in requested_modifiers:
         if unique_annihilated_atom_num:
             somd2_config.rest2_selection = (
                 "property is_perturbable and atomnum "
