@@ -247,18 +247,6 @@ def main():
         },
     }
 
-    # For rest2, add rest2 angle atoms if they exist
-    if "targetAngleRest2" in requested_modifiers:
-        if unique_annihilated_atom_num:
-            somd2_config.rest2_selection = (
-                "property is_perturbable and atomnum "
-                + ", ".join(map(str, unique_annihilated_atom_num))
-            )
-        else:
-            raise ValueError(
-                "No unique annihilated atom numbers found for rest2 angle selection."
-            )
-
     # Parse the user's requested protocol (e.g., "tucker_long_rest2")
     # We assume the first word is the base, and anything after an underscore is a modifier.
     protocol_parts = args.protocol.split("_")
@@ -285,6 +273,18 @@ def main():
     # Apply all parameters to the somd2_config object
     for param_name, param_value in final_config.items():
         setattr(somd2_config, param_name, param_value)
+
+    # For rest2, add rest2 angle atoms if they exist
+    if "targetAngleRest2" in requested_modifiers:
+        if unique_annihilated_atom_num:
+            somd2_config.rest2_selection = (
+                "property is_perturbable and atomnum "
+                + ", ".join(map(str, unique_annihilated_atom_num))
+            )
+        else:
+            raise ValueError(
+                "No unique annihilated atom numbers found for rest2 angle selection."
+            )
 
     # ==========================================
     # Directory Naming & Ghost Mods
