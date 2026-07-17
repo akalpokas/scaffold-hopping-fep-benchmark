@@ -1,6 +1,7 @@
 import argparse
 import json
 from pathlib import Path
+import re
 from pipeline._utils import validate_protocol
 
 from somd2.config import Config
@@ -158,6 +159,26 @@ def main():
         )
         somd2_config.restraints = [hard_restraints, soft_restraints]
 
+        # Now figure out which angles are being annihilated and use the atom numbers for tempering
+        changed_angles_df = pert_omm.changed_angles(to_pandas=True)
+
+        # Filter the DataFrame for rows where k0 == 0 OR k1 == 0 (for reverse and forward transformations)
+        filtered_df = changed_angles_df[
+            (changed_angles_df["k0"] == 0) | (changed_angles_df["k1"] == 0)
+        ]
+
+        # Extract the atom numbers
+        angle_atom_numbers = (
+            filtered_df["angle"]
+            .apply(lambda x: [int(n) for n in re.findall(r":(\d+)", str(x))])
+            .tolist()
+        )
+
+        # Flatten the list and get unique values
+        unique_annihilated_atom_num = sorted(
+            set(atom for sublist in angle_atom_numbers for atom in sublist)
+        )
+
     # ==========================================
     # MD Protocol Settings
     # ==========================================
@@ -177,6 +198,7 @@ def main():
         "timeout": "30s",
         "shift_delta": "1.5A",
         "shift_coulomb": "1A",
+        "save_energy_components": False,
     }
 
     # Define base setups
@@ -217,10 +239,25 @@ def main():
         "rest2": {
             "rest2_scale": 2,
         },
+        "target_angle_rest2": {
+            "rest2_scale": 2,
+        },
         "2fs": {
             "timestep": "2fs",
         },
     }
+
+    # For rest2, add rest2 angle atoms if they exist
+    if "target_angle_rest2" in requested_modifiers:
+        if unique_annihilated_atom_num:
+            somd2_config.rest2_selection = (
+                "property is_perturbable and atomnum "
+                + ", ".join(map(str, unique_annihilated_atom_num))
+            )
+        else:
+            raise ValueError(
+                "No unique annihilated atom numbers found for rest2 angle selection."
+            )
 
     # Parse the user's requested protocol (e.g., "tucker_long_rest2")
     # We assume the first word is the base, and anything after an underscore is a modifier.

@@ -2,7 +2,7 @@ import argparse
 
 # 1. Define the allowed components (keep these synced with your run script)
 VALID_BASES = {"testing", "prod", "tucker"}
-VALID_MODIFIERS = {"long", "rest2", "2fs"}
+VALID_MODIFIERS = {"long", "rest2", "target_angle_rest2", "2fs"}
 
 
 def validate_protocol(protocol_str: str) -> str:
