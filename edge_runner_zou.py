@@ -188,6 +188,36 @@ def main():
                 ktheta=f"{args.restraint_strength} kcal mol-1 rad-2",
             )
 
+        # RBFE SETUP
+        elif args.edge_id == "facx_4c_to_edo":
+            if args.leg_name == "bound":
+                restraints = sr.restraints.dihedral(
+                    mols=sire_system,
+                    atoms=[4434, 4410, 4411, 4412],
+                    kphi=f"{args.restraint_strength} kcal mol-1 rad-2",
+                )
+                restraints1 = sr.restraints.dihedral(
+                    mols=sire_system,
+                    atoms=[4413, 4412, 4411, 4410],
+                    kphi=f"{args.restraint_strength} kcal mol-1 rad-2",
+                )
+
+                restraints.add(restraints1)
+            elif args.leg_name == "free":
+                restraints = sr.restraints.dihedral(
+                    mols=sire_system,
+                    atoms=[36, 12, 13, 14],
+                    kphi=f"{args.restraint_strength} kcal mol-1 rad-2",
+                )
+
+                restraints1 = sr.restraints.dihedral(
+                    mols=sire_system,
+                    atoms=[15, 14, 13, 12],
+                    kphi=f"{args.restraint_strength} kcal mol-1 rad-2",
+                )
+
+                restraints.add(restraints1)
+
         somd2_config.restraints = restraints
 
     # ==========================================
@@ -246,6 +276,10 @@ def main():
         "long": {
             "equilibration_time": "1000ps",
             "runtime": "25000ps",
+        },
+        "short": {
+            "equilibration_time": "1000ps",
+            "runtime": "5000ps",
         },
         "rest2": {
             "rest2_scale": 2,
