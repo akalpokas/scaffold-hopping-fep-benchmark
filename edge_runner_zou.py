@@ -218,6 +218,198 @@ def main():
 
                 restraints.add(restraints1)
 
+        elif args.edge_id == "facx_4d_to_edo":
+            if args.leg_name == "bound":
+                restraints = sr.restraints.dihedral(
+                    mols=sire_system,
+                    atoms=[4444, 4419, 4420, 4421],
+                    kphi=f"{args.restraint_strength} kcal mol-1 rad-2",
+                )
+                restraints1 = sr.restraints.dihedral(
+                    mols=sire_system,
+                    atoms=[4422, 4421, 4420, 4419],
+                    kphi=f"{args.restraint_strength} kcal mol-1 rad-2",
+                )
+
+                restraints.add(restraints1)
+            elif args.leg_name == "free":
+                restraints = sr.restraints.dihedral(
+                    mols=sire_system,
+                    atoms=[36, 12, 13, 14],
+                    kphi=f"{args.restraint_strength} kcal mol-1 rad-2",
+                )
+
+                restraints1 = sr.restraints.dihedral(
+                    mols=sire_system,
+                    atoms=[15, 14, 13, 12],
+                    kphi=f"{args.restraint_strength} kcal mol-1 rad-2",
+                )
+
+                restraints.add(restraints1)
+
+        elif args.edge_id == "chk1_c20_to_c17":
+            if args.leg_name == "bound":
+                restraints = sr.restraints.dihedral(
+                    mols=sire_system,
+                    atoms=[4211, 4210, 4209, 4213],
+                    kphi=f"{args.restraint_strength} kcal mol-1 rad-2",
+                )
+                restraints1 = sr.restraints.dihedral(
+                    mols=sire_system,
+                    atoms=[4212, 4213, 4209, 4210],
+                    kphi=f"{args.restraint_strength} kcal mol-1 rad-2",
+                )
+
+                restraints.add(restraints1)
+            elif args.leg_name == "free":
+                restraints = sr.restraints.dihedral(
+                    mols=sire_system,
+                    atoms=[24, 23, 22, 26],
+                    kphi=f"{args.restraint_strength} kcal mol-1 rad-2",
+                )
+
+                restraints1 = sr.restraints.dihedral(
+                    mols=sire_system,
+                    atoms=[25, 26, 22, 23],
+                    kphi=f"{args.restraint_strength} kcal mol-1 rad-2",
+                )
+
+                restraints.add(restraints1)
+
+        elif args.edge_id == "chk1_c1_to_c17":
+            if args.leg_name == "bound":
+                restraints = sr.restraints.dihedral(
+                    mols=sire_system,
+                    atoms=[4214, 4213, 4210, 4209],
+                    kphi=f"{args.restraint_strength} kcal mol-1 rad-2",
+                )
+                restraints1 = sr.restraints.dihedral(
+                    mols=sire_system,
+                    atoms=[4215, 4211, 4210, 4213],
+                    kphi=f"{args.restraint_strength} kcal mol-1 rad-2",
+                )
+
+                restraints.add(restraints1)
+
+            elif args.leg_name == "free":
+                restraints = sr.restraints.dihedral(
+                    mols=sire_system,
+                    atoms=[27, 26, 23, 24],
+                    kphi=f"{args.restraint_strength} kcal mol-1 rad-2",
+                )
+
+                restraints1 = sr.restraints.dihedral(
+                    mols=sire_system,
+                    atoms=[28, 24, 23, 26],
+                    kphi=f"{args.restraint_strength} kcal mol-1 rad-2",
+                )
+
+                restraints.add(restraints1)
+
+        elif args.edge_id == "chk1_c1_to_c19":
+            if args.leg_name == "bound":
+                restraints = sr.restraints.dihedral(
+                    mols=sire_system,
+                    atoms=[4214, 4213, 4210, 4211],
+                    kphi=f"{args.restraint_strength} kcal mol-1 rad-2",
+                )
+                restraints1 = sr.restraints.dihedral(
+                    mols=sire_system,
+                    atoms=[4215, 4211, 4210, 4213],
+                    kphi=f"{args.restraint_strength} kcal mol-1 rad-2",
+                )
+
+                restraints.add(restraints1)
+
+            elif args.leg_name == "free":
+                restraints = sr.restraints.dihedral(
+                    mols=sire_system,
+                    atoms=[27, 26, 23, 24],
+                    kphi=f"{args.restraint_strength} kcal mol-1 rad-2",
+                )
+
+                restraints1 = sr.restraints.dihedral(
+                    mols=sire_system,
+                    atoms=[28, 24, 23, 26],
+                    kphi=f"{args.restraint_strength} kcal mol-1 rad-2",
+                )
+
+                restraints.add(restraints1)
+
+        elif args.edge_id == "tpsb_c2_to_c1":
+            if args.leg_name == "bound":
+                restraints = sr.restraints.dihedral(
+                    mols=sire_system,
+                    atoms=[3774, 3773, 3772, 3776],
+                    kphi=f"{args.restraint_strength} kcal mol-1 rad-2",
+                )
+                restraints1 = sr.restraints.dihedral(
+                    mols=sire_system,
+                    atoms=[3775, 3776, 3772, 3773],
+                    kphi=f"{args.restraint_strength} kcal mol-1 rad-2",
+                )
+
+                restraints.add(restraints1)
+
+            elif args.leg_name == "free":
+                restraints = sr.restraints.dihedral(
+                    mols=sire_system,
+                    atoms=[11, 10, 9, 13],
+                    kphi=f"{args.restraint_strength} kcal mol-1 rad-2",
+                )
+
+                restraints1 = sr.restraints.dihedral(
+                    mols=sire_system,
+                    atoms=[12, 13, 9, 10],
+                    kphi=f"{args.restraint_strength} kcal mol-1 rad-2",
+                )
+
+                restraints.add(restraints1)
+
+        elif args.edge_id == "bace_c7_to_c7rbi":
+            if args.leg_name == "bound":
+                restraints = sr.restraints.dihedral(
+                    mols=sire_system,
+                    atoms=[6067, 6047, 6046, 6045],
+                    kphi=f"{args.restraint_strength} kcal mol-1 rad-2",
+                )
+                restraints1 = sr.restraints.dihedral(
+                    mols=sire_system,
+                    atoms=[6047, 6046, 6045, 6065],
+                    kphi=f"{args.restraint_strength} kcal mol-1 rad-2",
+                )
+
+                restraints2 = sr.restraints.dihedral(
+                    mols=sire_system,
+                    atoms=[6081, 6065, 6045, 6046],
+                    kphi=f"{args.restraint_strength} kcal mol-1 rad-2",
+                )
+
+                restraints.add(restraints1)
+                restraints.add(restraints2)
+
+            elif args.leg_name == "free":
+                restraints = sr.restraints.dihedral(
+                    mols=sire_system,
+                    atoms=[28, 8, 7, 6],
+                    kphi=f"{args.restraint_strength} kcal mol-1 rad-2",
+                )
+
+                restraints1 = sr.restraints.dihedral(
+                    mols=sire_system,
+                    atoms=[42, 26, 6, 7],
+                    kphi=f"{args.restraint_strength} kcal mol-1 rad-2",
+                )
+
+                restraints2 = sr.restraints.dihedral(
+                    mols=sire_system,
+                    atoms=[8, 7, 6, 26],
+                    kphi=f"{args.restraint_strength} kcal mol-1 rad-2",
+                )
+
+                restraints.add(restraints1)
+                restraints.add(restraints2)
+
         somd2_config.restraints = restraints
 
     # ==========================================
@@ -278,7 +470,7 @@ def main():
             "runtime": "25000ps",
         },
         "short": {
-            "equilibration_time": "1000ps",
+            "equilibration_time": "500ps",
             "runtime": "5000ps",
         },
         "rest2": {
