@@ -82,7 +82,22 @@ def main():
 
     # Base Configuration
     somd2_config = Config()
-    somd2_config.lambda_values = [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0]
+    somd2_config.lambda_values = [
+        0.0,
+        0.1,
+        0.2,
+        0.3,
+        0.4,
+        0.5,
+        0.55,
+        0.6,
+        0.65,
+        0.675,
+        0.7,
+        0.8,
+        0.9,
+        1.0,
+    ]
 
     # Load System
     system_path = config.output_dir / f"{args.leg_name}.bss"
