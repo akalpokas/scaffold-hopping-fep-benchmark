@@ -158,17 +158,17 @@ def main():
         if args.edge_id == "cyclohexane_to_hexane":
             restraints = sr.restraints.dihedral(
                 mols=sire_system,
-                atoms=sire_system.dihedrals()[0],
+                atoms=[0, 1, 2, 3],
                 kphi=f"{args.restraint_strength} kcal mol-1 rad-2",
             )
             restraint1 = sr.restraints.dihedral(
                 mols=sire_system,
-                atoms=sire_system.dihedrals()[1],
+                atoms=[1, 2, 3, 4],
                 kphi=f"{args.restraint_strength} kcal mol-1 rad-2",
             )
             restraint2 = sr.restraints.dihedral(
                 mols=sire_system,
-                atoms=sire_system.dihedrals()[2],
+                atoms=[2, 3, 4, 5],
                 kphi=f"{args.restraint_strength} kcal mol-1 rad-2",
             )
             restraints.add(restraint1)
