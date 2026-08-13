@@ -261,6 +261,9 @@ def main():
             "equilibration_time": "1000ps",
             "runtime": "5000ps",
         },
+        "freqFrames": {
+            "frame_frequency": "1ps",
+        },
         "rest2": {
             "rest2_scale": 2,
         },
