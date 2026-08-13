@@ -4,6 +4,7 @@ from pathlib import Path
 from pipeline.schemas import RBFEEdge, RHFEEdge, AHFENode
 
 from analysis.ddG import ddGAnalyzer
+from analysis.ddG_short import ddGShortAnalyzer
 from analysis.energy_traj import EnergyTrajAnalyzer
 from analysis.convergence import ConvergenceAnalyzer
 
@@ -11,6 +12,7 @@ from analysis.convergence import ConvergenceAnalyzer
 AVAILABLE_MODULES = {
     "energy_traj": EnergyTrajAnalyzer(),
     "ddG": ddGAnalyzer(),
+    "ddG_short": ddGShortAnalyzer(),
     "convergence": ConvergenceAnalyzer(),
 }
 
