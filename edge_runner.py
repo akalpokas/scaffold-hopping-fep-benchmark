@@ -263,6 +263,7 @@ def main():
         },
         "freqFrames": {
             "frame_frequency": "1ps",
+            "checkpoint_frequency": "100ps",  # to prevent too many files being open at once
         },
         "rest2": {
             "rest2_scale": 2,
